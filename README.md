@@ -2,3 +2,5 @@
 
 Стек BackEnd:
 FastAPI, Postgres, Redis и т.д
+Стек FrontEnd:
+React.
