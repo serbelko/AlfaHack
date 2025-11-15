@@ -1,0 +1,60 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+
+# virtualenv
+.venv/
+venv/
+env/
+
+# byte-compiled / optimized / DLL files
+*.pyo
+*.pyd
+*.so
+
+# === Pydantic / mypy / pytest / coverage ===
+.mypy_cache/
+.pytest_cache/
+coverage/
+htmlcov/
+.coverage
+.coverage.*
+.cache/
+
+# === Logs ===
+logs/
+*.log
+
+# === Environment files ===
+.env
+.env.*
+!.env.example
+
+# === SQLite / локальные БД (если вдруг есть) ===
+*.sqlite
+*.sqlite3
+db.sqlite3
+
+# === IDE / редакторы ===
+.vscode/
+.idea/
+*.iml
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === Docker ===
+*.pid
+docker-compose.override.yml
+
+# === Alembic (генерируемые файлы миграций, по желанию) ===
+# Если миграции хочешь хранить в репо, закомментируй этот блок
+alembic.ini
+alembic/versions/*.pyc
+alembic/versions/__pycache__/
+
+# === Misc ===
+*.swp
+*.swo

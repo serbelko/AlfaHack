@@ -61,3 +61,15 @@ class InvalidVerifyTokenException(AuthException):
 class InvalidPasswordExepiton(AuthException):
     def __init__(self, status_code = status.HTTP_401_UNAUTHORIZED):
         super().__init__("Email or Password is Incorrect")
+
+
+class UserAlreadyExistsError(Exception):
+    pass
+
+
+class UserNotFoundError(Exception):
+    pass
+
+
+class InvalidCredentialsError(Exception):
+    pass
