@@ -1,0 +1,43 @@
+.competitor-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  cursor: pointer;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
+}
+
+.competitor-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 13px;
+  background: #d9d9d9;
+  flex-shrink: 0;
+}
+
+.competitor-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.competitor-name {
+  font-size: 16px;
+  font-weight: 530;
+  line-height: 22px;
+  color: #000;
+}
+
+.competitor-subtitle {
+  font-size: 14px;
+  font-weight: 530;
+  line-height: 22px;
+  color: #000;
+}
+
+.competitor-description {
+  font-size: 14px;
+  font-weight: 530;
+  line-height: 22px;
+  color: #000;
+}
