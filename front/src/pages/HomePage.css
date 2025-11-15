@@ -1,0 +1,345 @@
+.home-page {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
+  padding-top: 70px;
+  padding-bottom: 80px;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px 25px 16px;
+  gap: 10px;
+}
+
+.logo-circle {
+  width: 35px;
+  height: 35px;
+  background: #ef3125;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-circle span {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.business-selector {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 6px 14px 6px 8px;
+  background: #fff;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  flex: 1;
+  max-width: 250px;
+}
+
+.business-selector span {
+  font-size: 16px;
+  font-weight: 530;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.calendar-icon {
+  width: 21px;
+  height: 21px;
+}
+
+.bell-icon {
+  width: 21px;
+  height: 21px;
+}
+
+.balance-cards {
+  display: flex;
+  padding: 0 16px;
+  gap: 11px;
+  margin-bottom: 32px;
+}
+
+.balance-card {
+  display: flex;
+  align-items: center;
+  gap: 33px;
+  padding: 17px 18px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.03), 0 6px 6px rgba(0, 0, 0, 0.03), 0 14px 8px rgba(0, 0, 0, 0.02);
+  flex: 1;
+  min-width: 0;
+}
+
+.balance-card.deposits {
+  gap: 0;
+}
+
+.balance-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.balance-label {
+  font-size: 16px;
+  font-weight: 530;
+  color: #000;
+  line-height: 22px;
+}
+
+.balance-amount {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.amount-whole {
+  color: #000;
+}
+
+.amount-decimal {
+  color: #656565;
+}
+
+.balance-subtitle {
+  font-size: 16px;
+  font-weight: 530;
+  color: rgba(163, 163, 163, 1);
+  line-height: 22px;
+}
+
+.chevron-icon {
+  flex-shrink: 0;
+}
+
+.assistant-card {
+  margin: 0 16px 32px 16px;
+  padding: 16px 20px 16px 16px;
+  background: rgba(239, 49, 37, 1);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.assistant-card:hover {
+  opacity: 0.95;
+}
+
+.assistant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 13px;
+}
+
+.assistant-title-group {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.assistant-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  flex-shrink: 0;
+}
+
+.assistant-name {
+  font-size: 16px;
+  font-weight: 530;
+  color: #fff;
+  line-height: 22px;
+}
+
+.assistant-message {
+  font-size: 14px;
+  font-weight: 530;
+  color: #fff;
+  line-height: 22px;
+}
+
+.chevron-icon-white {
+  flex-shrink: 0;
+}
+
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 0 16px;
+  margin-bottom: 32px;
+}
+
+.account-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+.currency-icon {
+  width: 24px;
+  padding: 1px 0;
+  background: #000;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.currency-icon span {
+  font-size: 18px;
+  font-weight: 400;
+  color: rgba(244, 245, 247, 1);
+  line-height: 22px;
+}
+
+.account-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.account-amount {
+  font-size: 16px;
+  font-weight: 530;
+  color: #000;
+  line-height: 22px;
+}
+
+.amount-bold {
+  font-weight: 700;
+}
+
+.account-name {
+  font-size: 14px;
+  font-weight: 530;
+  line-height: 22px;
+}
+
+.account-number {
+  color: #000;
+}
+
+.warning-text {
+  color: rgba(239, 49, 37, 1);
+}
+
+.all-accounts-link {
+  padding: 0 16px;
+  margin-bottom: 32px;
+  cursor: pointer;
+}
+
+.all-accounts-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 16px 16px;
+  background: #fff;
+  border-radius: 16px;
+  transition: background 0.2s ease;
+}
+
+.all-accounts-content:hover {
+  background: #f9f9f9;
+}
+
+.all-accounts-content span {
+  font-size: 16px;
+  font-weight: 530;
+  color: #000;
+  line-height: 22px;
+}
+
+.tasks-section {
+  padding: 32px;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+}
+
+.tasks-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+  line-height: 22px;
+  margin: 0 0 34px 0;
+}
+
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+.task-icon {
+  flex-shrink: 0;
+}
+
+.task-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.task-name {
+  font-size: 16px;
+  font-weight: 530;
+  color: #000;
+  line-height: 22px;
+}
+
+.task-description {
+  font-size: 14px;
+  font-weight: 530;
+  color: rgba(163, 163, 163, 1);
+  line-height: 22px;
+}
+
+@media (max-width: 400px) {
+  .balance-cards {
+    flex-direction: column;
+  }
+
+  .business-selector {
+    max-width: 180px;
+  }
+
+  .business-selector span {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 600px) {
+  .home-page {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}

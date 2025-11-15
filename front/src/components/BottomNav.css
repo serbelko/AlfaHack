@@ -1,0 +1,105 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 10px;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
+  border-top: 1px solid #f4f5f7;
+}
+
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  width: 63px;
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+}
+
+.ruble-icon {
+  width: 24px;
+  padding: 1px 0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ruble-icon span {
+  font-size: 18px;
+  font-weight: 400;
+  color: rgba(244, 245, 247, 1);
+  line-height: 22px;
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.services-icon {
+  width: 24px;
+  height: 24px;
+  position: relative;
+}
+
+.service-block {
+  position: absolute;
+  border-radius: 1px;
+}
+
+.block-1 {
+  width: 11px;
+  height: 16px;
+  top: 0;
+  left: 0;
+}
+
+.block-2 {
+  width: 11px;
+  height: 6px;
+  bottom: 0;
+  left: 0;
+}
+
+.block-3 {
+  width: 11px;
+  height: 12px;
+  top: 0;
+  right: 0;
+}
+
+.block-4 {
+  width: 11px;
+  height: 10px;
+  bottom: 0;
+  right: 0;
+}
+
+.nav-label {
+  font-size: 14px;
+  font-weight: 530;
+  line-height: 22px;
+  text-align: center;
+  color: #858589;
+}
+
+.bottom-nav__item--active .nav-label {
+  color: rgba(239, 49, 37, 1);
+}
+
+@media (min-width: 600px) {
+  .bottom-nav {
+    max-width: 600px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

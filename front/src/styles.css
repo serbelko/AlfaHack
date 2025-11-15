@@ -1,0 +1,201 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: rgba(244, 245, 247, 1);
+  color: #111827;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+  padding: 0;
+  padding-bottom: 80px;
+}
+
+/* Нижняя навигация */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  border-top: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.bottom-nav__item {
+  text-decoration: none;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.bottom-nav__item--active {
+  color: #ef4444; /* красный акцент */
+  font-weight: 600;
+}
+
+/* Простейшие общие блоки */
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  border: none;
+  background-color: #ef4444;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.button--secondary {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+/* Модальное окно-оверлей */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+}
+
+.modal {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  max-width: 420px;
+  width: 100%;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Период */
+
+.period-selector {
+  display: inline-flex;
+  border-radius: 9999px;
+  background-color: #e5e7eb;
+  padding: 4px;
+  gap: 4px;
+}
+
+.period-selector__btn {
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #4b5563;
+}
+
+.period-selector__btn--active {
+  background-color: #ffffff;
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* Простейшая заглушка графика */
+
+.analytics-chart {
+  height: 160px;
+  border-radius: 12px;
+  background: repeating-linear-gradient(
+    to right,
+    #fee2e2,
+    #fee2e2 4px,
+    #fecaca 4px,
+    #fecaca 8px
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #7f1d1d;
+}
+
+/* Для форм */
+
+.input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.input-error {
+  border-color: #ef4444;
+}
+
+.error-text {
+  color: #b91c1c;
+  font-size: 12px;
+  margin-top: 4px;
+}
