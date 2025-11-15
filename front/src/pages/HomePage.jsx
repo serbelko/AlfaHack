@@ -1,20 +1,44 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
+import { getAllAmounts } from "../api/amountApi";
 
-const mockAccounts = [
-  { id: 1, amount: "100 000,90 ₽", name: "Расчётный ••1234", warning: null },
-  { id: 2, amount: "100 000,90 ₽", name: "Расчётный ••1234", warning: null },
-  {
-    id: 3,
-    amount: "100 000,90 ₽",
-    name: "Расчётный ••1234",
-    warning: "Блокировка ФНС на 30 000,00₽",
-  },
-];
+// форматирование денег под "русский" формат
+function formatAmountRu(value) {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return "0,00";
+  }
+  return value.toLocaleString("ru-RU", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
 
 function HomePage() {
   const navigate = useNavigate();
+
+  const [accounts, setAccounts] = useState([]);
+
+  useEffect(() => {
+    async function loadAccounts() {
+      try {
+        const data = await getAllAmounts();
+        // ТЗ: { amounts: { { "count": 123, "name": "string" } }, limit_data: int }
+        const amounts = data?.amounts || [];
+        setAccounts(amounts);
+      } catch (err) {
+        console.error("Ошибка загрузки счетов", err);
+        setAccounts([]);
+      }
+    }
+
+    loadAccounts();
+  }, []);
+
+  // суммарный остаток по всем счетам
+  const totalBalance = accounts.reduce((sum, acc) => sum + (acc.count || 0), 0);
+  const totalFormatted = formatAmountRu(totalBalance);
+  const [totalWhole, totalDecimal = "00"] = totalFormatted.split(",");
 
   return (
     <div className="home-page">
@@ -43,14 +67,64 @@ function HomePage() {
               stroke="black"
               strokeWidth="2"
             />
-            <path d="M0.993164 7.44305H19.9932" stroke="black" strokeWidth="2" />
-            <rect x="4.49658" y="11.5" width="2" height="2" rx="0.55" fill="black" />
-            <rect x="9.49658" y="11.5" width="2" height="2" rx="0.55" fill="black" />
-            <rect x="14.4966" y="11.5" width="2" height="2" rx="0.55" fill="black" />
-            <rect x="4.49658" y="16.5" width="2" height="2" rx="0.55" fill="black" />
-            <rect x="9.49658" y="16.5" width="2" height="2" rx="0.55" fill="black" />
-            <rect x="14.4966" y="16.5" width="2" height="2" rx="0.55" fill="black" />
-            <path d="M5.74487 2.4642V0.0133057" stroke="black" strokeWidth="2" />
+            <path
+              d="M0.993164 7.44305H19.9932"
+              stroke="black"
+              strokeWidth="2"
+            />
+            <rect
+              x="4.49658"
+              y="11.5"
+              width="2"
+              height="2"
+              rx="0.55"
+              fill="black"
+            />
+            <rect
+              x="9.49658"
+              y="11.5"
+              width="2"
+              height="2"
+              rx="0.55"
+              fill="black"
+            />
+            <rect
+              x="14.4966"
+              y="11.5"
+              width="2"
+              height="2"
+              rx="0.55"
+              fill="black"
+            />
+            <rect
+              x="4.49658"
+              y="16.5"
+              width="2"
+              height="2"
+              rx="0.55"
+              fill="black"
+            />
+            <rect
+              x="9.49658"
+              y="16.5"
+              width="2"
+              height="2"
+              rx="0.55"
+              fill="black"
+            />
+            <rect
+              x="14.4966"
+              y="16.5"
+              width="2"
+              height="2"
+              rx="0.55"
+              fill="black"
+            />
+            <path
+              d="M5.74487 2.4642V0.0133057"
+              stroke="black"
+              strokeWidth="2"
+            />
             <path d="M15.2415 2.45089V0" stroke="black" strokeWidth="2" />
           </svg>
         </button>
@@ -74,10 +148,14 @@ function HomePage() {
           <div className="balance-content">
             <div className="balance-label">Доступный остаток</div>
             <div className="balance-amount">
-              <span className="amount-whole">700 500</span>
-              <span className="amount-decimal">,00 ₽</span>
+              <span className="amount-whole">
+                {totalWhole?.replace(/\u00A0/g, " ")}
+              </span>
+              <span className="amount-decimal">,{totalDecimal} ₽</span>
             </div>
-            <div className="balance-subtitle">на 5 рублёвых счетах</div>
+            <div className="balance-subtitle">
+              на {accounts.length} рублёвых счетах
+            </div>
           </div>
           <svg
             className="chevron-icon"
@@ -136,32 +214,39 @@ function HomePage() {
       </div>
 
       <div className="accounts-list">
-        {mockAccounts.map((account) => (
-          <div key={account.id} className="account-item">
-            <div className="currency-icon">
-              <span>₽</span>
-            </div>
-            <div className="account-details">
-              <div className="account-amount">
-                <span className="amount-bold">
-                  {account.amount.split(",")[0]}
-                </span>
-                <span>,{account.amount.split(",")[1]}</span>
+        {accounts.map((account, index) => {
+          const formatted = formatAmountRu(account.count || 0);
+          const [whole, decimal = "00"] = formatted.split(",");
+
+          return (
+            <div key={account.name || index} className="account-item">
+              <div className="currency-icon">
+                <span>₽</span>
               </div>
-              <div
-                className={`account-name ${account.warning ? "has-warning" : ""}`}
-              >
-                <span className="account-number">{account.name}</span>
-                {account.warning && (
-                  <>
-                    {" "}
-                    <span className="warning-text">{account.warning}</span>
-                  </>
-                )}
+              <div className="account-details">
+                <div className="account-amount">
+                  <span className="amount-bold">
+                    {whole?.replace(/\u00A0/g, " ")}
+                  </span>
+                  <span>,{decimal}</span>
+                </div>
+                <div
+                  className={`account-name ${
+                    account.warning ? "has-warning" : ""
+                  }`}
+                >
+                  <span className="account-number">{account.name}</span>
+                  {account.warning && (
+                    <>
+                      {" "}
+                      <span className="warning-text">{account.warning}</span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="all-accounts-link" onClick={() => navigate("/accounts")}>

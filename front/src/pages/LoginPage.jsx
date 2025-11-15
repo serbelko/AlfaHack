@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
+import { loginRequest } from "../api/authApi";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -9,20 +10,27 @@ function LoginPage() {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      if (login === "demo" && password === "demo") {
-        navigate("/", { replace: true });
+    try {
+      await loginRequest(login, password);
+      navigate("/", { replace: true });
+    } catch (err) {
+      console.error(err);
+      if (err.status === 401) {
+        // ТЗ: wrong login or password
+        setError("Неверный логин или пароль");
+      } else if (err.status === 404) {
+        setError("Сервис авторизации не найден (404)");
       } else {
-        setError("Неверные данные");
+        setError("Техническая ошибка. Попробуйте позже");
       }
-    }, 500);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = () => {
