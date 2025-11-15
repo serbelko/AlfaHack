@@ -14,6 +14,21 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  mock_db:
+    image: postgres:16-alpine
+    container_name: mock_postgres
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${MOCK_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${MOCK_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${MOCK_POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - mock_postgres_data:/var/lib/postgresql/data
+
   app:
     build:
       context: ./back      # тут лежат Dockerfile, main.py, requirements.txt
@@ -23,9 +38,11 @@ services:
       - .env
     depends_on:
       - db
+      - mock_db
     ports:
       - "8000:8000"
     # command убираем, используем CMD из Dockerfile
 
 volumes:
   postgres_data:
+  mock_postgres_data:
