@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 export function getToken() {
   return localStorage.getItem("authToken");
@@ -14,20 +14,14 @@ export function setToken(token) {
 }
 
 export async function request(path, options = {}) {
-  const {
-    method = "GET",
-    body,
-    auth = false, // нужно ли добавлять Authorization
-  } = options;
+  const { method = "GET", body, auth = false } = options;
 
-  const headers = {
-    "Content-Type": "application/json",
-  };
+  const headers = { "Content-Type": "application/json" };
 
   if (auth) {
     const token = getToken();
     if (token) {
-      headers["Authorization"] = `Bearer ${token}`; // если бэк реально требует "Baerer", тут одну строку поменяем
+      headers.Authorization = `Bearer ${token}`; // если бэк реально ждёт "Baerer", поменяешь здесь
     }
   }
 

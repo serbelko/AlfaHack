@@ -1,6 +1,7 @@
 .analytics-page {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
-  padding-top: 70px;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+  background: rgba(244, 245, 247, 1);
+  min-height: 100vh;
   padding-bottom: 80px;
 }
 
@@ -8,7 +9,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px 25px 20px;
+  padding: 70px 16px 25px 20px;
   height: 34px;
 }
 
@@ -26,9 +27,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 24px;
+  height: 24px;
 }
 
-.page-header-title {
+.back-button:hover {
+  opacity: 0.7;
+}
+
+.page-title {
   font-size: 16px;
   font-weight: 530;
   line-height: 22px;
@@ -40,7 +47,7 @@
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  background: #d9d9d9;
+  background: linear-gradient(135deg, #EF3125 0%, #FF6B5B 100%);
   flex-shrink: 0;
 }
 
@@ -53,7 +60,7 @@
 
 .tab-button {
   flex: 1;
-  padding: 4px 10px 5px 10px;
+  padding: 4px 10px 5px;
   background: #fff;
   border: none;
   border-radius: 28px;
@@ -62,7 +69,7 @@
   line-height: 22px;
   color: #000;
   cursor: pointer;
-  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-family: inherit;
   transition: all 0.2s ease;
 }
 
@@ -73,184 +80,56 @@
 
 .analytics-content {
   padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .analytics-card {
   background: #fff;
   border-radius: 16px;
   padding: 16px;
-  margin-bottom: 12px;
 }
 
-.analytics-card-title {
-  font-size: 16px;
+.income-expenses-summary {
+  margin: 19px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-line {
+  font-size: 14px;
   font-weight: 530;
   line-height: 22px;
-  color: #000;
-  margin-bottom: 8px;
 }
 
-.custom-period-text {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #4b5563;
+.summary-label {
+  color: #000;
+}
+
+.summary-value {
+  font-weight: 530;
+}
+
+.summary-value.income {
+  color: rgba(0, 193, 13, 1);
+}
+
+.summary-value.expense {
+  color: rgba(239, 49, 37, 1);
 }
 
 .promotion-content {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+  padding: 0 16px;
 }
 
-.niche-card {
-  margin: 0 16px;
-  padding: 16px;
+.empty-state {
   background: #fff;
   border-radius: 16px;
-}
-
-.niche-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 13px;
-}
-
-.niche-title {
-  font-size: 16px;
-  font-weight: 530;
-  line-height: 22px;
-  color: #000;
-}
-
-.help-button {
-  width: 22px;
-  height: 22px;
-  border-radius: 13px;
-  background: rgba(244, 245, 247, 1);
-  border: none;
-  font-size: 14px;
-  font-weight: 530;
-  line-height: 22px;
-  color: #000;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
-}
-
-.niche-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 8px;
-}
-
-.niche-tag {
-  padding: 4px 17px 5px 17px;
-  background: rgba(244, 245, 247, 1);
-  border-radius: 28px;
-  font-size: 14px;
-  font-weight: 530;
-  line-height: 22px;
-  color: #000;
-  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
-}
-
-.competitors-section {
-  margin: 0 16px;
-}
-
-.competitors-title {
-  font-size: 16px;
-  font-weight: 530;
-  line-height: 22px;
-  color: #000;
-  margin-bottom: 13px;
-}
-
-.competitors-list {
-  background: #fff;
-  border-radius: 16px;
-  padding: 16px;
-}
-
-.competitor-divider {
-  height: 2px;
-  background: rgba(244, 245, 247, 1);
-  margin: 13px 0;
-  border-radius: 1px;
-}
-
-.recommendation-promo {
-  margin: 0 16px;
-  padding: 16px 20px 16px 16px;
-  background: rgba(239, 49, 37, 1);
-  border-radius: 16px;
-  display: flex;
-  gap: 26px;
-}
-
-.promo-avatar {
-  width: 95.55px;
-  height: 95.55px;
-  border-radius: 50%;
-  background: #d9d9d9;
-  flex-shrink: 0;
-}
-
-.promo-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-}
-
-.promo-title {
-  font-size: 16px;
-  font-weight: 530;
-  line-height: 22px;
-  color: #fff;
-}
-
-.promo-text {
-  font-size: 14px;
-  font-weight: 530;
-  line-height: 22px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.promo-button {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 17px 5px 17px;
-  background: rgba(255, 255, 255, 0.5);
-  border: none;
-  border-radius: 28px;
-  font-size: 14px;
-  font-weight: 530;
-  line-height: 22px;
-  color: #fff;
-  cursor: pointer;
-  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
-  transition: background 0.2s ease;
-}
-
-.promo-button:hover {
-  background: rgba(255, 255, 255, 0.6);
-}
-
-@media (max-width: 400px) {
-  .recommendation-promo {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .promo-avatar {
-    width: 60px;
-    height: 60px;
-  }
+  padding: 40px 16px;
+  text-align: center;
+  color: #666;
 }
 
 @media (min-width: 600px) {
