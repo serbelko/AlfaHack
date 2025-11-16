@@ -1,13 +1,13 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    POSTGRES_HOST: str
-    POSTGRES_PORT: int
+    POSTGRES_HOST: str = "db"
+    POSTGRES_PORT: int = 5432
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
-    DATABASE_URL: str
-    ASYNC_DATABASE_URL: str
+    DATABASE_URL: str | None = None
+    ASYNC_DATABASE_URL: str | None = None
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     SECRET_KEY: str
     PASSWORD_MIN_LENGTH: int
@@ -22,6 +22,16 @@ class Settings(BaseSettings):
     MOCK_POSTGRES_USER: str
     MOCK_POSTGRES_PASSWORD: str
     MOCK_POSTGRES_DB: str
+
+    @property
+    def ASYNC_DATABASE_URL_computed(self) -> str:
+        """Вычисляемый URL для основной БД, использует имя сервиса 'db' в Docker"""
+        if self.ASYNC_DATABASE_URL:
+            return self.ASYNC_DATABASE_URL
+        return (
+            f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        )
 
     @property
     def MOCK_ASYNC_DATABASE_URL(self) -> str:

@@ -1,4 +1,5 @@
 services:
+  # База данных
   db:
     image: postgres:16-alpine
     container_name: app_postgres
@@ -13,7 +14,15 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
+  # Mock база данных
   mock_db:
     image: postgres:16-alpine
     container_name: mock_postgres
@@ -28,21 +37,128 @@ services:
       - "5433:5432"
     volumes:
       - mock_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MOCK_POSTGRES_USER:-postgres} -d ${MOCK_POSTGRES_DB:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  app:
+  # Backend API
+  backend:
     build:
-      context: ./back      # тут лежат Dockerfile, main.py, requirements.txt
+      context: ./back
+      dockerfile: Dockerfile
     container_name: app_backend
     restart: always
     env_file:
       - .env
     depends_on:
-      - db
-      - mock_db
+      db:
+        condition: service_healthy
+      mock_db:
+        condition: service_healthy
     ports:
       - "8000:8000"
-    # command убираем, используем CMD из Dockerfile
+    networks:
+      - app-network
+
+  # Ollama для AI сервиса
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./back/solution/entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+  # AI Service (Solution)
+  ai-service:
+    build:
+      context: ./back/solution
+      dockerfile: dockerfile
+    container_name: solution-app
+    ports:
+      - "8001:8001"
+    environment:
+      - OLLAMA_URL=http://ollama:11434/
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: app_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - ai-service
+    networks:
+      - app-network
+
+  # Скрипт заполнения пользователей (одноразовый)
+  seed-users:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: seed_users
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python -m app.scripts.seed_users
+    networks:
+      - app-network
+    profiles:
+      - seed
+
+  # Скрипт заполнения счетов и транзакций (одноразовый)
+  seed-amounts:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: seed_amounts
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      mock_db:
+        condition: service_healthy
+      seed-users:
+        condition: service_completed_successfully
+    command: python -m app.scripts.seed_amounts
+    networks:
+      - app-network
+    profiles:
+      - seed
 
 volumes:
   postgres_data:
   mock_postgres_data:
+  ollama_data:
+
+networks:
+  app-network:
+    driver: bridge

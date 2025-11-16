@@ -28,7 +28,7 @@ logs/
 
 # === Environment files ===
 .env
-.env.*
+.env.
 !.env.example
 
 # === SQLite / локальные БД (если вдруг есть) ===

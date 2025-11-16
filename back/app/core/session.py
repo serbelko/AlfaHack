@@ -4,7 +4,7 @@ from collections.abc import AsyncGenerator
 
 # Основная БД
 engine = create_async_engine(
-    settings.ASYNC_DATABASE_URL,
+    settings.ASYNC_DATABASE_URL_computed,
     pool_pre_ping=True,
     pool_size=10,
     max_overflow=20,
