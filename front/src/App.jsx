@@ -5,7 +5,7 @@ import MainLayout from "./layouts/MainLayout";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
-import RecommendationDetailPage from "./pages/RecommendationDetailPage";
+import RecommendationDetailsPage from "./pages/RecommendationDetailsPage"; // ← добавлено
 import PromotionPage from "./pages/PromotionPage";
 import NicheDescriptionPage from "./pages/NicheDescriptionPage";
 import CompetitorDetailPage from "./pages/CompetitorDetailPage";
@@ -41,17 +41,25 @@ function App() {
         }
       >
         <Route index element={<HomePage />} />
+
+        {/* АНАЛИТИКА */}
         <Route path="analytics" element={<AnalyticsPage />} />
+
+        {/* 👇 новая страница рекомендаций */}
         <Route
           path="analytics/recommendation"
-          element={<RecommendationDetailPage />}
+          element={<RecommendationDetailsPage />}
         />
+
+        {/* ПРОДВИЖЕНИЕ */}
         <Route path="promotion" element={<PromotionPage />} />
         <Route path="promotion/niche" element={<NicheDescriptionPage />} />
         <Route
           path="promotion/competitor/:id"
           element={<CompetitorDetailPage />}
         />
+
+        {/* ДРУГИЕ СТРАНИЦЫ */}
         <Route path="payments" element={<PaymentsPage />} />
         <Route path="accounts" element={<AccountsPage />} />
         <Route path="services" element={<ServicesPage />} />

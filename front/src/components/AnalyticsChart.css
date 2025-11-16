@@ -60,3 +60,57 @@
   font-size: 13px;
   color: #8e8e93;
 }
+/* Контейнер графика */
+.analytics-chart {
+  width: 100%;
+  margin-top: 12px;
+}
+
+/* Сам SVG-график */
+.analytics-chart-svg {
+  width: 100%;
+  height: 160px;
+  display: block;
+  border-radius: 16px;
+  background-color: #ffffff; /* чистый белый фон без полос */
+  overflow: hidden;
+}
+
+/* Вертикальные прямоугольники-grid: полностью скрываем */
+.analytics-chart-grid-line {
+  fill: transparent;
+}
+
+/* Общие стили для линий графика */
+.analytics-chart-line {
+  fill: none;
+  stroke-width: 2;
+}
+
+/* Линия доходов (зелёная) */
+.analytics-chart-line--income {
+  stroke: #27ae60;
+}
+
+/* Линия расходов (красная) */
+.analytics-chart-line--expenses {
+  stroke: #eb5757;
+}
+
+/* Подписи по оси X (дни, месяцы и т.п.) */
+.analytics-chart-x-label {
+  font-size: 10px;
+  fill: #8e8e93;
+}
+
+/* Плейсхолдер, когда нет данных за период */
+.analytics-chart-empty {
+  height: 160px;
+  border-radius: 16px;
+  background-color: #f7f7f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #8e8e93;
+}

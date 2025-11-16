@@ -1,8 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./RecommendationCard.css";
 import recAvatar from "../assets/recommendation/recommend-avatar.png";
 
 function RecommendationCard() {
+  const navigate = useNavigate();
+
+  const handleDetails = () => {
+    navigate("/analytics/recommendation");
+  };
+
   return (
     <div className="recommend-card">
       <div className="recommend-avatar-wrapper">
@@ -14,10 +21,16 @@ function RecommendationCard() {
           />
         </div>
       </div>
+
       <div className="recommend-content">
         <div className="recommend-title">Твоя рекомендация</div>
         <div className="recommend-text">Обрати внимание на эквайринг</div>
-        <button className="recommend-button" type="button">
+
+        <button
+          className="recommend-button"
+          type="button"
+          onClick={handleDetails}
+        >
           Подробнее
           <span className="recommend-button-arrow">›</span>
         </button>

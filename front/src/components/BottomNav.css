@@ -1,69 +1,57 @@
 .bottom-nav-wrapper {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding-bottom: env(safe-area-inset-bottom);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
+  padding: 0 16px 8px;
+  box-sizing: border-box;
 }
 
 .bottom-nav {
-  pointer-events: auto;
-  width: 100%;
-  max-width: 430px;
-  margin: 0 auto;
-  padding: 14px 34px 22px 34px;
-  border-radius: 28px 28px 0 0;
-  background: #fff;
-  box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.12);
-
+  height: 72px;
+  background-color: #ffffff;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.08);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  height: 100px;
-  box-sizing: border-box;
+  justify-content: space-around;
 }
 
 .bottom-nav-item {
   flex: 1;
+  height: 100%;
+  padding-top: 10px;
+  padding-bottom: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   text-decoration: none;
+  color: #8e8e93;
+  font-size: 11px;
+  font-weight: 500;
+  gap: 4px;
 }
 
-.bottom-nav-icon-svg {
-  width: 48px; /* ← УВЕЛИЧИЛ ТАК, ЧТО ВСЁ БУДЕТ ВИДНО */
-  height: 48px;
-  object-fit: contain; /* PNG внутри SVG растягивается корректно */
-  margin-bottom: 4px;
-
-  filter: grayscale(1) opacity(0.6);
-  transition: 0.2s;
-}
-
-.bottom-nav-item--active .bottom-nav-icon-svg {
-  filter: none;
+.bottom-nav-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
 }
 
 .bottom-nav-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #8e8e93;
+  line-height: 1.2;
 }
 
-.bottom-nav-item--active .bottom-nav-label {
+.bottom-nav-item--active {
   color: #ff3b30;
 }
 
-.bottom-nav-indicator {
-  width: 140px;
-  height: 5px;
+.bottom-nav-item--active .bottom-nav-icon {
+  filter: none;
+}
+
+.bottom-nav-home-indicator {
+  width: 90px;
+  height: 4px;
   border-radius: 999px;
-  background: #0c0c0c;
-  margin-top: 8px;
-  margin-bottom: 10px;
+  background-color: #000000;
+  opacity: 0.18;
+  margin: 6px auto 0;
 }

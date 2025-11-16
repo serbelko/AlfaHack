@@ -1,17 +1,10 @@
 import "./AnalyticsChart.css";
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 
 function AnalyticsChart({ incomeData = [], expensesData = [], labels = [] }) {
   const hasData =
     (Array.isArray(incomeData) && incomeData.length > 0) ||
     (Array.isArray(expensesData) && expensesData.length > 0);
-  useEffect(() => {
-    console.log("GRAPH DATA:", {
-      incomeData,
-      expensesData,
-      labels,
-    });
-  }, [incomeData, expensesData, labels]);
 
   const { incomePath, expensesPath, xTicks, viewBoxWidth, viewBoxHeight } =
     useMemo(() => {

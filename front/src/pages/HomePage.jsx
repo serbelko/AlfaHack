@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import { getAllAmounts } from "../api/amountApi";
+import assistantAvatar from "../assets/header/avatar.png";
 
 // форматирование денег под "русский" формат
 function formatAmountRu(value) {
@@ -23,7 +24,6 @@ function HomePage() {
     async function loadAccounts() {
       try {
         const data = await getAllAmounts();
-        // ТЗ: { amounts: { { "count": 123, "name": "string" } }, limit_data: int }
         const amounts = data?.amounts || [];
         setAccounts(amounts);
       } catch (err) {
@@ -35,7 +35,6 @@ function HomePage() {
     loadAccounts();
   }, []);
 
-  // суммарный остаток по всем счетам
   const totalBalance = accounts.reduce((sum, acc) => sum + (acc.count || 0), 0);
   const totalFormatted = formatAmountRu(totalBalance);
   const [totalWhole, totalDecimal = "00"] = totalFormatted.split(",");
@@ -189,7 +188,13 @@ function HomePage() {
       <div className="assistant-card" onClick={() => navigate("/analytics")}>
         <div className="assistant-header">
           <div className="assistant-title-group">
-            <div className="assistant-avatar"></div>
+            <div className="assistant-avatar">
+              <img
+                src={assistantAvatar}
+                alt="Альфа Помощник"
+                className="assistant-avatar-image"
+              />
+            </div>
             <div className="assistant-name">Альфа Помощник</div>
           </div>
           <svg

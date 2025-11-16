@@ -2,15 +2,15 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import "./BottomNav.css";
 
-import home from "../assets/icons/bottom-nav/home.svg";
-import payments from "../assets/icons/bottom-nav/payments.svg";
-import services from "../assets/icons/bottom-nav/services.svg";
-import chat from "../assets/icons/bottom-nav/chat.svg";
-import profile from "../assets/icons/bottom-nav/profile.svg";
+import homeIcon from "../assets/icons/bottom-nav/home.svg";
+import paymentsIcon from "../assets/icons/bottom-nav/payments.svg";
+import servicesIcon from "../assets/icons/bottom-nav/services.svg";
+import contactIcon from "../assets/icons/bottom-nav/chat.svg";
+import profileIcon from "../assets/icons/bottom-nav/profile.svg";
 
 function BottomNav() {
   return (
-    <div className="bottom-nav-wrapper">
+    <nav className="bottom-nav-wrapper">
       <div className="bottom-nav">
         <NavLink
           to="/"
@@ -19,7 +19,8 @@ function BottomNav() {
             "bottom-nav-item" + (isActive ? " bottom-nav-item--active" : "")
           }
         >
-          <img src={home} alt="Главный" className="bottom-nav-icon-svg" />
+          <img src={homeIcon} alt="" className="bottom-nav-icon" />
+          <span className="bottom-nav-label">Главный</span>
         </NavLink>
 
         <NavLink
@@ -28,7 +29,8 @@ function BottomNav() {
             "bottom-nav-item" + (isActive ? " bottom-nav-item--active" : "")
           }
         >
-          <img src={payments} alt="Платежи" className="bottom-nav-icon-svg" />
+          <img src={paymentsIcon} alt="" className="bottom-nav-icon" />
+          <span className="bottom-nav-label">Платежи</span>
         </NavLink>
 
         <NavLink
@@ -37,7 +39,8 @@ function BottomNav() {
             "bottom-nav-item" + (isActive ? " bottom-nav-item--active" : "")
           }
         >
-          <img src={services} alt="Сервисы" className="bottom-nav-icon-svg" />
+          <img src={servicesIcon} alt="" className="bottom-nav-icon" />
+          <span className="bottom-nav-label">Сервисы</span>
         </NavLink>
 
         <NavLink
@@ -46,7 +49,8 @@ function BottomNav() {
             "bottom-nav-item" + (isActive ? " bottom-nav-item--active" : "")
           }
         >
-          <img src={chat} alt="Связь" className="bottom-nav-icon-svg" />
+          <img src={contactIcon} alt="" className="bottom-nav-icon" />
+          <span className="bottom-nav-label">Связь</span>
         </NavLink>
 
         <NavLink
@@ -55,12 +59,13 @@ function BottomNav() {
             "bottom-nav-item" + (isActive ? " bottom-nav-item--active" : "")
           }
         >
-          <img src={profile} alt="Профиль" className="bottom-nav-icon-svg" />
+          <img src={profileIcon} alt="" className="bottom-nav-icon" />
+          <span className="bottom-nav-label">Профиль</span>
         </NavLink>
       </div>
 
-      <div className="bottom-nav-indicator" />
-    </div>
+      <div className="bottom-nav-home-indicator" />
+    </nav>
   );
 }
 

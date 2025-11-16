@@ -2,7 +2,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 // здесь меняешь имя счёта, если хочешь реальный, а не заглушку
-const DEFAULT_ACCOUNT_NAME = "Мой счёт";
+const DEFAULT_ACCOUNT_NAME = "test";
 
 function buildHistoryQuery(params) {
   const search = new URLSearchParams();

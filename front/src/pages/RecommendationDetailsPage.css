@@ -1,0 +1,131 @@
+.reco-page {
+  min-height: 100vh;
+  background-color: #f5f5f7;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 24px;
+  box-sizing: border-box;
+}
+
+.reco-header {
+  display: flex;
+  align-items: center;
+  padding-top: 12px;
+  padding-bottom: 8px;
+}
+
+.reco-back-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  border: none;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  padding: 0;
+}
+
+.reco-header-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.reco-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.reco-card {
+  margin-top: 12px;
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 18px 16px 20px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+.reco-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.reco-card-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background-color: rgba(255, 59, 48, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  overflow: hidden;
+}
+
+.reco-card-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reco-card-header-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.reco-card-label {
+  font-size: 13px;
+  color: #8e8e93;
+}
+
+.reco-card-main-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #000000;
+  margin-top: 2px;
+}
+
+.reco-intro {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #4a4a4a;
+  margin-bottom: 12px;
+}
+
+.reco-block {
+  margin-top: 10px;
+}
+
+.reco-block-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.reco-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.reco-list-item {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #4a4a4a;
+  margin-bottom: 6px;
+}
+
+.reco-primary-button {
+  margin-top: 18px;
+  width: 100%;
+  height: 40px;
+  border-radius: 999px;
+  border: none;
+  background-color: #ff3b30;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
