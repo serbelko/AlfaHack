@@ -4,10 +4,15 @@ import PeriodSelector from "../components/PeriodSelector";
 import AnalyticsChart from "../components/AnalyticsChart";
 import RecommendationCard from "../components/RecommendationCard";
 import DateRangeModal from "../components/DateRangeModal";
+import NicheHelpModal from "../components/NicheHelpModal";
 import "./AnalyticsPage.css";
 import { getCompetitors } from "../api/promotionApi";
+import { getAnalyticsFromHistory } from "../api/analyticsApi";
+import nailsImage from "../assets/competitors/nails.png";
+import spaImage from "../assets/competitors/spa.png";
+import massageImage from "../assets/competitors/massage.png";
+import headerAvatar from "../assets/header/avatar.png";
 
-// Если у тебя уже есть свой mockDataByPeriod — можешь использовать его вместо этого
 const mockDataByPeriod = {
   month: {
     income: 700000,
@@ -17,15 +22,15 @@ const mockDataByPeriod = {
     labels: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
   },
   year: {
-    income: 8000000,
-    expenses: 5200000,
+    income: 8200000,
+    expenses: 5100000,
     incomeData: [
-      500000, 600000, 700000, 800000, 900000, 1000000, 900000, 800000, 700000,
-      600000, 500000, 400000,
+      500000, 600000, 700000, 800000, 900000, 1000000, 1100000, 900000, 800000,
+      700000, 600000, 500000,
     ],
     expensesData: [
-      300000, 320000, 340000, 360000, 380000, 400000, 420000, 440000, 460000,
-      480000, 500000, 520000,
+      300000, 350000, 400000, 450000, 500000, 550000, 600000, 500000, 450000,
+      400000, 350000, 300000,
     ],
     labels: [
       "Янв",
@@ -51,6 +56,36 @@ const mockDataByPeriod = {
   },
 };
 
+const competitorStubData = [
+  {
+    id: 1,
+    name: "Имидж-лаборатория",
+    profile:
+      "Аппаратный, комбинированный маникюр и педикюр, модный дизайн, спа-уход",
+    image: nailsImage,
+  },
+  {
+    id: 2,
+    name: "Спа-центр",
+    profile: "Подарочные сертификаты, которые приятно дарить",
+    image: spaImage,
+  },
+  {
+    id: 3,
+    name: "Сеть салонов красоты",
+    profile: "Полный спектр услуг по уходу за собой",
+    image: massageImage,
+  },
+];
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat("ru-RU", {
+    style: "currency",
+    currency: "RUB",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 function AnalyticsPage({ initialTab = "analytics" }) {
   const navigate = useNavigate();
 
@@ -59,17 +94,23 @@ function AnalyticsPage({ initialTab = "analytics" }) {
   const [customRange, setCustomRange] = useState({ from: null, to: null });
   const [showRangeModal, setShowRangeModal] = useState(false);
 
-  const currentData = mockDataByPeriod[period] || mockDataByPeriod.month;
-
-  // Состояния для продвижения
   const [city, setCity] = useState("Москва");
   const [niche, setNiche] = useState("Ногтевой сервис");
   const [priceSegment, setPriceSegment] = useState("До 5000₽");
   const [district, setDistrict] = useState("Сухаревская");
 
-  const [competitors, setCompetitors] = useState([]);
+  const [competitors, setCompetitors] = useState(competitorStubData);
   const [competitorsLoading, setCompetitorsLoading] = useState(false);
   const [competitorsError, setCompetitorsError] = useState(null);
+
+  const [showNicheHelp, setShowNicheHelp] = useState(false);
+
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState(null);
+
+  const baseData = mockDataByPeriod[period] || mockDataByPeriod.month;
+  const currentData = analyticsData || baseData;
 
   const handlePeriodChange = (value) => {
     if (value === "custom") {
@@ -82,23 +123,55 @@ function AnalyticsPage({ initialTab = "analytics" }) {
 
   const handleApplyRange = ({ from, to }) => {
     setCustomRange({ from, to });
-    setShowRangeModal(false);
     setPeriod("custom");
+    setShowRangeModal(false);
   };
 
-  const formatCurrency = (value) => {
-    return (
-      new Intl.NumberFormat("ru-RU", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(value) + "₽"
-    );
-  };
-
-  // Загрузка конкурентов при переходе на вкладку "Продвижение"
-  // или изменении фильтров
   useEffect(() => {
-    if (activeTab !== "promotion") return;
+    if (activeTab !== "analytics") return;
+    let cancelled = false;
+
+    async function loadAnalytics() {
+      setAnalyticsLoading(true);
+      setAnalyticsError(null);
+      try {
+        const params =
+          period === "custom"
+            ? { period, from: customRange.from, to: customRange.to }
+            : { period };
+        const data = await getAnalyticsFromHistory(params);
+        if (!cancelled) {
+          if (data.incomeData.length === 0 && data.expensesData.length === 0) {
+            setAnalyticsData(null);
+          } else {
+            setAnalyticsData(data);
+          }
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setAnalyticsData(null);
+          setAnalyticsError(e.status || "error");
+        }
+      } finally {
+        if (!cancelled) {
+          setAnalyticsLoading(false);
+        }
+      }
+    }
+
+    loadAnalytics();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, period, customRange.from, customRange.to]);
+
+  useEffect(() => {
+    if (activeTab !== "promotion") {
+      return;
+    }
+
+    let isCancelled = false;
 
     async function loadCompetitors() {
       setCompetitorsLoading(true);
@@ -112,85 +185,114 @@ function AnalyticsPage({ initialTab = "analytics" }) {
           district,
         });
 
-        // поддерживаем оба варианта ответа:
-        // либо массив, либо { competitors: [...] }
-        const list = Array.isArray(data) ? data : data?.competitors || [];
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.competitors)
+          ? data.competitors
+          : [];
 
-        setCompetitors(list);
-      } catch (err) {
-        console.error("Ошибка загрузки конкурентов", err);
-        if (err.status === 403) {
-          setCompetitorsError("Сессия истекла. Войдите снова.");
-        } else {
-          setCompetitorsError("Не удалось загрузить конкурентов.");
+        if (!isCancelled) {
+          if (list.length > 0) {
+            setCompetitors(list);
+          } else {
+            setCompetitors(competitorStubData);
+          }
+        }
+      } catch {
+        if (!isCancelled) {
+          setCompetitors(competitorStubData);
+          setCompetitorsError(null);
         }
       } finally {
-        setCompetitorsLoading(false);
+        if (!isCancelled) {
+          setCompetitorsLoading(false);
+        }
       }
     }
 
     loadCompetitors();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [activeTab, city, niche, priceSegment, district]);
 
   return (
     <div className="analytics-page">
       <header className="analytics-header">
-        <div className="header-left">
-          <button
-            className="back-button"
-            onClick={() => navigate("/")}
-            aria-label="Назад"
-          >
-            <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
-              <path
-                d="M6.65674 12.3137L0.999885 6.65685L6.65674 0.999997"
-                stroke="black"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <h1 className="page-title">Альфа Помощник</h1>
+        <div className="header-top">
+          <div className="header-left">
+            <button
+              type="button"
+              className="back-button"
+              onClick={() => navigate("/")}
+              aria-label="Назад"
+            >
+              <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                <path
+                  d="M6.65674 12.3137L0.999885 6.65685L6.65674 0.999997"
+                  stroke="black"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <h1 className="page-title">Альфа Помощник</h1>
+          </div>
+          <div className="header-avatar">
+            <img src={headerAvatar} alt="Профиль" />
+          </div>
         </div>
-        <div className="assistant-avatar"></div>
-      </header>
 
-      <div className="tab-selector">
-        <button
-          className={`tab-button ${activeTab === "analytics" ? "active" : ""}`}
-          onClick={() => setActiveTab("analytics")}
-        >
-          Аналитика
-        </button>
-        <button
-          className={`tab-button ${activeTab === "promotion" ? "active" : ""}`}
-          onClick={() => setActiveTab("promotion")}
-        >
-          Продвижение
-        </button>
-      </div>
+        <div className="header-tabs">
+          <button
+            type="button"
+            className={`header-tab ${
+              activeTab === "analytics" ? "header-tab-active" : ""
+            }`}
+            onClick={() => setActiveTab("analytics")}
+          >
+            Аналитика
+          </button>
+          <button
+            type="button"
+            className={`header-tab ${
+              activeTab === "promotion" ? "header-tab-active" : ""
+            }`}
+            onClick={() => setActiveTab("promotion")}
+          >
+            Продвижение
+          </button>
+        </div>
+      </header>
 
       {activeTab === "analytics" && (
         <div className="analytics-content">
           <div className="analytics-card">
             <PeriodSelector value={period} onChange={handlePeriodChange} />
-
             <div className="income-expenses-summary">
               <div className="summary-line">
-                <span className="summary-label">Всего доходов </span>
+                <span className="summary-label">Всего доходов</span>
                 <span className="summary-value income">
-                  {formatCurrency(currentData.income)}
+                  {formatCurrency(currentData.income || 0)}
                 </span>
               </div>
               <div className="summary-line">
-                <span className="summary-label">Всего расходов </span>
+                <span className="summary-label">Всего расходов</span>
                 <span className="summary-value expense">
-                  {formatCurrency(currentData.expenses)}
+                  {formatCurrency(currentData.expenses || 0)}
                 </span>
               </div>
             </div>
-
+            {analyticsLoading && (
+              <div className="analytics-loading">Загружаем данные…</div>
+            )}
+            {!analyticsLoading && analyticsError && (
+              <div className="analytics-error">
+                Не удалось загрузить данные, показана заглушка
+              </div>
+            )}
             <AnalyticsChart
               incomeData={currentData.incomeData}
               expensesData={currentData.expensesData}
@@ -199,21 +301,11 @@ function AnalyticsPage({ initialTab = "analytics" }) {
           </div>
 
           <RecommendationCard />
-
-          {showRangeModal && (
-            <DateRangeModal
-              initialFrom={customRange.from}
-              initialTo={customRange.to}
-              onApply={handleApplyRange}
-              onClose={() => setShowRangeModal(false)}
-            />
-          )}
         </div>
       )}
 
       {activeTab === "promotion" && (
         <div className="promotion-content">
-          {/* Карточка "Твоя ниша" */}
           <div className="analytics-card promotion-niche-card">
             <div className="card-title-row">
               <div className="card-title">Твоя ниша</div>
@@ -221,6 +313,7 @@ function AnalyticsPage({ initialTab = "analytics" }) {
                 type="button"
                 className="niche-help-button"
                 aria-label="Описание ниши"
+                onClick={() => setShowNicheHelp(true)}
               >
                 ?
               </button>
@@ -269,16 +362,11 @@ function AnalyticsPage({ initialTab = "analytics" }) {
             </div>
           </div>
 
-          {/* Карточка "Основные конкуренты" */}
           <div className="analytics-card promotion-competitors-card">
             <div className="card-title">Основные конкуренты</div>
 
             {competitorsLoading && (
               <div className="card-subtitle">Загружаем конкурентов…</div>
-            )}
-
-            {competitorsError && !competitorsLoading && (
-              <div className="error-text">{competitorsError}</div>
             )}
 
             {!competitorsLoading &&
@@ -289,18 +377,30 @@ function AnalyticsPage({ initialTab = "analytics" }) {
                 </div>
               )}
 
+            {!competitorsLoading && competitorsError && (
+              <div className="error-text">{competitorsError}</div>
+            )}
+
             {!competitorsLoading &&
               !competitorsError &&
               competitors.map((c) => (
                 <div key={c.id || c.name} className="competitor-item">
-                  <div className="competitor-avatar-placeholder" />
+                  <div className="competitor-avatar-placeholder">
+                    {c.image && (
+                      <img
+                        src={c.image}
+                        alt={c.name}
+                        className="competitor-avatar-image"
+                      />
+                    )}
+                  </div>
                   <div className="competitor-text">
                     <div className="competitor-label">Название</div>
                     <div className="competitor-name">{c.name}</div>
                     {c.profile && (
                       <div className="competitor-profile">{c.profile}</div>
                     )}
-                    {c.description && !c.profile && (
+                    {c.description && (
                       <div className="competitor-profile">{c.description}</div>
                     )}
                   </div>
@@ -308,15 +408,33 @@ function AnalyticsPage({ initialTab = "analytics" }) {
               ))}
           </div>
 
-          {/* Нижняя красная рекомендация под продвижение (можно потом вынести в компонент) */}
           <div className="promotion-tip-card">
             <div className="promotion-tip-text">
               Публикуйте больше сториз: клиентам больше доверяют студиям,
               которые готовы рассказывать о себе!
             </div>
-            <button className="promotion-tip-button">Подробнее</button>
+            <button
+              type="button"
+              className="promotion-tip-button"
+              onClick={() => navigate("/analytics/recommendation")}
+            >
+              Подробнее
+            </button>
           </div>
         </div>
+      )}
+
+      {showRangeModal && (
+        <DateRangeModal
+          initialFrom={customRange.from}
+          initialTo={customRange.to}
+          onApply={handleApplyRange}
+          onClose={() => setShowRangeModal(false)}
+        />
+      )}
+
+      {showNicheHelp && (
+        <NicheHelpModal onClose={() => setShowNicheHelp(false)} />
       )}
     </div>
   );

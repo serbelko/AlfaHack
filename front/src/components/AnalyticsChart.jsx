@@ -1,99 +1,161 @@
-import React from "react";
 import "./AnalyticsChart.css";
+import React, { useMemo, useEffect } from "react";
 
 function AnalyticsChart({ incomeData = [], expensesData = [], labels = [] }) {
-  const maxValue = Math.max(...incomeData, ...expensesData);
-  const minValue = 0;
-  const range = maxValue - minValue;
-  
-  const gridLines = [
-    maxValue,
-    maxValue * 0.75,
-    maxValue * 0.5,
-    maxValue * 0.25,
-    0
-  ];
-
-  const formatValue = (value) => {
-    return new Intl.NumberFormat('ru-RU', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value) + '₽';
-  };
-
-  const getYPosition = (value) => {
-    return ((maxValue - value) / range) * 186;
-  };
-
-  const createPath = (data) => {
-    if (!data || data.length === 0) return "";
-    
-    const xStep = 254 / (data.length - 1);
-    const points = data.map((value, index) => {
-      const x = index * xStep;
-      const y = getYPosition(value);
-      return `${x},${y}`;
+  const hasData =
+    (Array.isArray(incomeData) && incomeData.length > 0) ||
+    (Array.isArray(expensesData) && expensesData.length > 0);
+  useEffect(() => {
+    console.log("GRAPH DATA:", {
+      incomeData,
+      expensesData,
+      labels,
     });
-    
-    return `M ${points.join(" L ")}`;
-  };
+  }, [incomeData, expensesData, labels]);
 
-  const incomePath = createPath(incomeData);
-  const expensesPath = createPath(expensesData);
+  const { incomePath, expensesPath, xTicks, viewBoxWidth, viewBoxHeight } =
+    useMemo(() => {
+      if (!hasData) {
+        return {
+          incomePath: "",
+          expensesPath: "",
+          xTicks: [],
+          viewBoxWidth: 320,
+          viewBoxHeight: 160,
+        };
+      }
 
-  const displayLabels = labels.length > 0 ? labels : 
-    incomeData.slice(0, 5).map((_, i) => `${i + 1}`);
+      const length = Math.max(
+        incomeData.length,
+        expensesData.length,
+        labels.length || 0
+      );
+
+      const xCount = length > 1 ? length - 1 : 1;
+      const width = 320;
+      const height = 160;
+
+      const allValues = [
+        ...incomeData.filter((v) => typeof v === "number"),
+        ...expensesData.filter((v) => typeof v === "number"),
+      ];
+
+      let minY = Math.min(...allValues);
+      let maxY = Math.max(...allValues);
+
+      if (minY === maxY) {
+        // чтобы линии не были идеально прямыми по центру
+        minY = minY * 0.9;
+        maxY = maxY * 1.1 || 1;
+      }
+
+      const paddingTop = 12;
+      const paddingBottom = 18;
+      const paddingLeft = 4;
+      const paddingRight = 4;
+
+      const chartWidth = width - paddingLeft - paddingRight;
+      const chartHeight = height - paddingTop - paddingBottom;
+
+      const scaleX = xCount === 0 ? 0 : chartWidth / xCount;
+      const scaleY = maxY === minY ? 0 : chartHeight / (maxY - minY);
+
+      const makePath = (data) => {
+        if (!data || data.length === 0) return "";
+
+        return data
+          .map((value, index) => {
+            const x = paddingLeft + index * scaleX;
+            const y = paddingTop + chartHeight - (value - minY) * scaleY;
+            return `${index === 0 ? "M" : "L"} ${x} ${y}`;
+          })
+          .join(" ");
+      };
+
+      const incomePathLocal = makePath(incomeData);
+      const expensesPathLocal = makePath(expensesData);
+
+      const ticks = labels.slice(0, length).map((label, index) => {
+        const x = paddingLeft + index * scaleX;
+        return { x, label };
+      });
+
+      return {
+        incomePath: incomePathLocal,
+        expensesPath: expensesPathLocal,
+        xTicks: ticks,
+        viewBoxWidth: width,
+        viewBoxHeight: height,
+      };
+    }, [incomeData, expensesData, labels, hasData]);
 
   return (
     <div className="analytics-chart">
-      <div className="chart-grid">
-        {gridLines.map((value, index) => (
-          <div
-            key={index}
-            className="grid-line"
-            style={{ top: `${getYPosition(value)}px` }}
-          >
-            <svg width="273" height="1" viewBox="0 0 274 1" fill="none">
-              <path
-                d="M0.5 0.5L273.5 0.500024"
-                stroke="#A3A3A3"
-                strokeLinecap="round"
-                strokeDasharray="4 4"
-              />
-            </svg>
-            <span className="grid-label">{formatValue(value)}</span>
-          </div>
-        ))}
-      </div>
+      {!hasData && (
+        <div className="analytics-chart-empty">
+          Нет данных за выбранный период
+        </div>
+      )}
 
-      <svg className="chart-svg" width="254" height="186" viewBox="0 0 254 186">
-        {incomePath && (
-          <path
-            d={incomePath}
-            stroke="#00C10D"
-            strokeWidth="1"
-            strokeLinecap="round"
-            fill="none"
+      {hasData && (
+        <svg
+          className="analytics-chart-svg"
+          viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+          preserveAspectRatio="none"
+        >
+          {/* горизонтальные пунктирные линии (3 уровня) */}
+          <line
+            x1="8"
+            y1="32"
+            x2={viewBoxWidth - 8}
+            y2="32"
+            className="analytics-chart-grid-line"
           />
-        )}
-        {expensesPath && (
-          <path
-            d={expensesPath}
-            stroke="#EF3125"
-            strokeWidth="1"
-            strokeLinecap="round"
-            fill="none"
+          <line
+            x1="8"
+            y1="80"
+            x2={viewBoxWidth - 8}
+            y2="80"
+            className="analytics-chart-grid-line"
           />
-        )}
-      </svg>
+          <line
+            x1="8"
+            y1={viewBoxHeight - 32}
+            x2={viewBoxWidth - 8}
+            y2={viewBoxHeight - 32}
+            className="analytics-chart-grid-line"
+          />
 
-      <div className="chart-x-labels">
-        {displayLabels.map((label, index) => (
-          <span key={index} className="x-label">
-            {label}
-          </span>
-        ))}
-      </div>
+          {/* линия доходов */}
+          {incomePath && (
+            <path
+              d={incomePath}
+              className="analytics-chart-line analytics-chart-line--income"
+            />
+          )}
+
+          {/* линия расходов */}
+          {expensesPath && (
+            <path
+              d={expensesPath}
+              className="analytics-chart-line analytics-chart-line--expenses"
+            />
+          )}
+
+          {/* подписи по оси X */}
+          {xTicks.map((tick, idx) => (
+            <text
+              key={idx}
+              x={tick.x}
+              y={viewBoxHeight - 4}
+              textAnchor="middle"
+              className="analytics-chart-x-label"
+            >
+              {tick.label}
+            </text>
+          ))}
+        </svg>
+      )}
     </div>
   );
 }

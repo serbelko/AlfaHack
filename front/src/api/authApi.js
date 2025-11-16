@@ -1,11 +1,10 @@
-import { request, setToken } from "./httpClient";
+import { request, setToken, getToken } from "./httpClient";
 
 export async function loginRequest(login, password) {
   const data = await request("/api/auth/login", {
     method: "POST",
     body: { login, password },
   });
-  // ожидаем { "token": "..." } и статус 201
   if (!data || !data.token) {
     throw new Error("Некорректный ответ сервера: нет токена");
   }
@@ -18,6 +17,11 @@ export async function getMe() {
     method: "GET",
     auth: true,
   });
+}
+
+export function isAuthenticated() {
+  const token = getToken();
+  return Boolean(token);
 }
 
 export async function logoutRequest() {
