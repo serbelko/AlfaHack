@@ -106,6 +106,15 @@ function LoginPage() {
         >
           Забыли логин или пароль?
         </button>
+        <div className="login-extra-info">
+          <h3 className="login-extra-title">Полезная информация</h3>
+
+          <ul className="login-extra-list">
+            <li>• Никому не сообщайте пароль и код подтверждения</li>
+            <li>• Проверьте, что вы вошли на официальный сайт</li>
+            <li>• Восстановление доступа доступно через поддержку</li>
+          </ul>
+        </div>
       </div>
     </div>
   );

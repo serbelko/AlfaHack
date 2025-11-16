@@ -1,36 +1,62 @@
-.chart-container {
-  margin-top: 12px;
+.analytics-chart {
   width: 100%;
-}
-
-.chart-inner {
-  background: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.chart-svg {
-  display: block;
-}
-
-.chart-x-axis {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  padding: 0 6px;
-}
-
-.chart-x-label {
-  font-size: 11px;
-  color: #8e8e93;
-}
-
-.chart-empty {
   margin-top: 12px;
-  padding: 16px;
-  border-radius: 12px;
-  background: #f5f6f8;
+}
+
+/* Сам SVG */
+.analytics-chart-svg {
+  width: 100%;
+  height: 160px;
+  display: block;
+  border-radius: 16px;
+
+  /* очень мягкий фон со светло-красными полосами */
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(255, 59, 48, 0.03),
+    rgba(255, 59, 48, 0.03) 4px,
+    rgba(255, 255, 255, 0) 4px,
+    rgba(255, 255, 255, 0) 8px
+  );
+  background-color: #ffffff;
+}
+
+/* пунктирные линии, если используешь */
+.analytics-chart-grid-line {
+  stroke: #e5e5ea;
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+/* линии графика */
+.analytics-chart-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.analytics-chart-line--income {
+  stroke: #34c759;
+}
+
+.analytics-chart-line--expenses {
+  stroke: #ff3b30;
+}
+
+.analytics-chart-x-label {
+  font-size: 10px;
+  fill: #8e8e93;
+}
+
+/* плейсхолдер при отсутствии данных */
+.analytics-chart-empty {
+  height: 160px;
+  border-radius: 16px;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 13px;
   color: #8e8e93;
-  text-align: center;
 }

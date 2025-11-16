@@ -4,9 +4,10 @@ import PeriodSelector from "../components/PeriodSelector";
 import AnalyticsChart from "../components/AnalyticsChart";
 import RecommendationCard from "../components/RecommendationCard";
 import DateRangeModal from "../components/DateRangeModal";
-import NicheHelpModal from "../components/NicheHelpModal.jsx";
+import NicheHelpModal from "../components/NicheHelpModal";
 import "./AnalyticsPage.css";
 import { getCompetitors } from "../api/promotionApi";
+import { getAnalyticsFromHistory } from "../api/analyticsApi";
 import nailsImage from "../assets/competitors/nails.png";
 import spaImage from "../assets/competitors/spa.png";
 import massageImage from "../assets/competitors/massage.png";
@@ -104,7 +105,12 @@ function AnalyticsPage({ initialTab = "analytics" }) {
 
   const [showNicheHelp, setShowNicheHelp] = useState(false);
 
-  const currentData = mockDataByPeriod[period] || mockDataByPeriod.month;
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState(null);
+
+  const baseData = mockDataByPeriod[period] || mockDataByPeriod.month;
+  const currentData = analyticsData || baseData;
 
   const handlePeriodChange = (value) => {
     if (value === "custom") {
@@ -120,6 +126,45 @@ function AnalyticsPage({ initialTab = "analytics" }) {
     setPeriod("custom");
     setShowRangeModal(false);
   };
+
+  useEffect(() => {
+    if (activeTab !== "analytics") return;
+    let cancelled = false;
+
+    async function loadAnalytics() {
+      setAnalyticsLoading(true);
+      setAnalyticsError(null);
+      try {
+        const params =
+          period === "custom"
+            ? { period, from: customRange.from, to: customRange.to }
+            : { period };
+        const data = await getAnalyticsFromHistory(params);
+        if (!cancelled) {
+          if (data.incomeData.length === 0 && data.expensesData.length === 0) {
+            setAnalyticsData(null);
+          } else {
+            setAnalyticsData(data);
+          }
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setAnalyticsData(null);
+          setAnalyticsError(e.status || "error");
+        }
+      } finally {
+        if (!cancelled) {
+          setAnalyticsLoading(false);
+        }
+      }
+    }
+
+    loadAnalytics();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, period, customRange.from, customRange.to]);
 
   useEffect(() => {
     if (activeTab !== "promotion") {
@@ -230,16 +275,24 @@ function AnalyticsPage({ initialTab = "analytics" }) {
               <div className="summary-line">
                 <span className="summary-label">Всего доходов</span>
                 <span className="summary-value income">
-                  {formatCurrency(currentData.income)}
+                  {formatCurrency(currentData.income || 0)}
                 </span>
               </div>
               <div className="summary-line">
                 <span className="summary-label">Всего расходов</span>
                 <span className="summary-value expense">
-                  {formatCurrency(currentData.expenses)}
+                  {formatCurrency(currentData.expenses || 0)}
                 </span>
               </div>
             </div>
+            {analyticsLoading && (
+              <div className="analytics-loading">Загружаем данные…</div>
+            )}
+            {!analyticsLoading && analyticsError && (
+              <div className="analytics-error">
+                Не удалось загрузить данные, показана заглушка
+              </div>
+            )}
             <AnalyticsChart
               incomeData={currentData.incomeData}
               expensesData={currentData.expensesData}
