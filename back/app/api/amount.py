@@ -1,5 +1,4 @@
 from typing import Optional
-from datetime import datetime
 
 from fastapi import (
     APIRouter,
@@ -12,18 +11,26 @@ from fastapi import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.session import get_mock_session
+from app.core.logger import get_logger
 from app.repo.amount import AmountRepository
+from app.services.amount import AmountService
+from app.core.exeptions import (
+    AmountNotFoundError,
+    AmountAlreadyExistsError,
+    InvalidAmountDataError,
+    InvalidTransactionDataError,
+)
 from app.schemas.amount import (
     AmountResponse,
     AmountListResponse,
     HistoryResponse,
     AmountCreateRequest,
     TransactionCreateRequest,
-    TransactionItem,
 )
 from app.services.security import SecurityManager
 
 router = APIRouter(prefix="/api/amount", tags=["amount"])
+logger = get_logger(__name__)
 
 
 async def verify_token(
@@ -33,6 +40,7 @@ async def verify_token(
     Проверяет JWT токен из заголовка Authorization.
     """
     if not authorization:
+        logger.warning("Token verification failed: Authorization header not found")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="JWT NOT FOUND",
@@ -40,6 +48,7 @@ async def verify_token(
 
     parts = authorization.split()
     if len(parts) != 2 or parts[0].lower() != "bearer":
+        logger.warning("Token verification failed: Invalid Authorization header format")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="JWT NOT FOUND",
@@ -49,11 +58,25 @@ async def verify_token(
 
     try:
         SecurityManager.decode_access_token(token)
-    except Exception:
+        logger.debug("Token verified successfully")
+    except Exception as e:
+        logger.warning(f"Token verification failed: Invalid token - {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="JWT NOT FOUND",
         )
+
+
+# ---------- Зависимость: AmountService ----------
+
+async def get_amount_service(
+    session: AsyncSession = Depends(get_mock_session),
+) -> AmountService:
+    """
+    Создаёт экземпляр AmountService с репозиторием.
+    """
+    repo = AmountRepository(session)
+    return AmountService(repo)
 
 
 @router.get(
@@ -64,7 +87,7 @@ async def verify_token(
 )
 async def get_amount(
     name: str = Query(..., description="Имя счёта"),
-    session: AsyncSession = Depends(get_mock_session),
+    amount_service: AmountService = Depends(get_amount_service),
 ):
     """
     GET /api/amount?name=string - данные по счёту
@@ -78,17 +101,16 @@ async def get_amount(
     }
     
     Response 403: JWT NOT FOUND
+    Response 404: СЧЁТ НЕ НАЙДЕН
     """
-    repo = AmountRepository(session)
-    amount = await repo.get_amount_by_name(name)
-    
-    if not amount:
+    try:
+        amount = await amount_service.get_amount_by_name(name)
+        return AmountResponse(count=amount.count, name=amount.name)
+    except AmountNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="СЧЁТ НЕ НАЙДЕН",
         )
-    
-    return AmountResponse(count=amount.count, name=amount.name)
 
 
 @router.get(
@@ -98,7 +120,7 @@ async def get_amount(
     dependencies=[Depends(verify_token)],
 )
 async def get_all_amounts(
-    session: AsyncSession = Depends(get_mock_session),
+    amount_service: AmountService = Depends(get_amount_service),
 ):
     """
     GET /api/amount/
@@ -115,18 +137,7 @@ async def get_all_amounts(
     
     Response 403: JWT NOT FOUND
     """
-    repo = AmountRepository(session)
-    amounts = await repo.get_all_amounts()
-    
-    amount_responses = [
-        AmountResponse(count=amount.count, name=amount.name)
-        for amount in amounts
-    ]
-    
-    return AmountListResponse(
-        amounts=amount_responses,
-        limit_data=len(amount_responses)
-    )
+    return await amount_service.get_all_amounts()
 
 
 @router.post(
@@ -137,7 +148,7 @@ async def get_all_amounts(
 )
 async def create_amount(
     data: AmountCreateRequest,
-    session: AsyncSession = Depends(get_mock_session),
+    amount_service: AmountService = Depends(get_amount_service),
 ):
     """
     POST /api/amount - создать новый счёт
@@ -159,27 +170,15 @@ async def create_amount(
     Response 403: JWT NOT FOUND
     Response 401: Некорректные данные (если счёт с таким именем уже существует)
     """
-    repo = AmountRepository(session)
-    
-    # Проверяем, не существует ли уже счёт с таким именем
-    existing_amount = await repo.get_amount_by_name(data.name)
-    if existing_amount:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Некорректные данные",
-        )
-    
-    # Валидация суммы (не может быть отрицательной)
-    if data.count < 0:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Некорректные данные",
-        )
-    
     try:
-        amount = await repo.create_amount(data.name, data.count)
+        amount = await amount_service.create_amount(data.name, data.count)
         return AmountResponse(count=amount.count, name=amount.name)
-    except Exception:
+    except AmountAlreadyExistsError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Некорректные данные",
+        )
+    except InvalidAmountDataError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Некорректные данные",
@@ -193,7 +192,7 @@ async def create_amount(
 )
 async def get_transaction(
     name: str = Query(..., description="Имя счёта"),
-    session: AsyncSession = Depends(get_mock_session),
+    amount_service: AmountService = Depends(get_amount_service),
 ):
     """
     GET /api/amount/transaction?name=string - данные об одной транзакции
@@ -204,25 +203,14 @@ async def get_transaction(
     Response 403: JWT NOT FOUND
     Response 404: СЧЁТ НЕ НАЙДЕН
     """
-    repo = AmountRepository(session)
-    amount = await repo.get_amount_by_name(name)
-    
-    if not amount:
+    try:
+        transaction = await amount_service.get_latest_transaction(name)
+        return transaction if transaction else {}
+    except AmountNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="СЧЁТ НЕ НАЙДЕН",
         )
-    
-    transaction = await repo.get_latest_transaction(amount.id)
-    
-    if not transaction:
-        return {}
-    
-    return {
-        "type": transaction.type,
-        "category": transaction.category,
-        "count": transaction.count,
-    }
 
 
 @router.get(
@@ -236,7 +224,7 @@ async def get_history(
     from_date: Optional[str] = Query(None, description="Начало периода (YYYY-MM-DD)"),
     to_date: Optional[str] = Query(None, description="Конец периода (YYYY-MM-DD)"),
     type: Optional[str] = Query(None, description="Тип транзакции (input/outcome)"),
-    session: AsyncSession = Depends(get_mock_session),
+    amount_service: AmountService = Depends(get_amount_service),
 ):
     """
     GET /api/amount/history?name=string&from=date&to=date&type=string
@@ -254,75 +242,25 @@ async def get_history(
     
     Response 403: JWT NOT FOUND
     Response 401: Incorrect type of request
+    Response 404: СЧЁТ НЕ НАЙДЕН
     """
-    # Проверка типа транзакции
-    if type and type not in ['input', 'output', 'income', 'outcome']:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect type of request",
+    try:
+        return await amount_service.get_transaction_history(
+            account_name=name,
+            from_date=from_date,
+            to_date=to_date,
+            transaction_type=type,
         )
-    
-    # Преобразуем input/output в income/outcome для внутреннего использования
-    transaction_type = None
-    if type == 'input':
-        transaction_type = 'income'
-    elif type == 'output':
-        transaction_type = 'outcome'
-    elif type in ['income', 'outcome']:
-        transaction_type = type
-    
-    repo = AmountRepository(session)
-    amount = await repo.get_amount_by_name(name)
-    
-    if not amount:
+    except AmountNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="СЧЁТ НЕ НАЙДЕН",
         )
-    
-    # Парсим даты
-    from_dt = None
-    to_dt = None
-    if from_date:
-        try:
-            from_dt = datetime.strptime(from_date, "%Y-%m-%d")
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect type of request",
-            )
-    if to_date:
-        try:
-            to_dt = datetime.strptime(to_date, "%Y-%m-%d")
-            # Добавляем время конца дня
-            to_dt = to_dt.replace(hour=23, minute=59, second=59)
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect type of request",
-            )
-    
-    transactions = await repo.get_transactions(
-        amount.id,
-        from_date=from_dt,
-        to_date=to_dt,
-        transaction_type=transaction_type
-    )
-    
-    transaction_items = [
-        TransactionItem(
-            type=trans.type,
-            category=trans.category,
-            count=trans.count
+    except InvalidTransactionDataError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect type of request",
         )
-        for trans in transactions
-    ]
-    
-    return HistoryResponse(
-        name=amount.name,
-        transaction=transaction_items,
-        limit_data=len(transaction_items)
-    )
 
 
 @router.post(
@@ -332,7 +270,7 @@ async def get_history(
 )
 async def create_transaction(
     data: TransactionCreateRequest,
-    session: AsyncSession = Depends(get_mock_session),
+    amount_service: AmountService = Depends(get_amount_service),
 ):
     """
     POST /api/amount/transaction - добавить новую транзакцию
@@ -352,41 +290,22 @@ async def create_transaction(
     Response 404: СЧЁТ НЕ НАЙДЕН
     Response 401: Некорректные данные
     """
-    # Валидация типа транзакции
-    if data.type not in ['income', 'outcome']:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Некорректные данные",
+    try:
+        await amount_service.create_transaction(
+            account_name=data.name,
+            transaction_type=data.type,
+            category=data.category,
+            count=data.count,
         )
-    
-    # Валидация суммы
-    if data.count <= 0:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Некорректные данные",
-        )
-    
-    repo = AmountRepository(session)
-    amount = await repo.get_amount_by_name(data.name)
-    
-    if not amount:
+        return {}
+    except AmountNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="СЧЁТ НЕ НАЙДЕН",
         )
-    
-    try:
-        await repo.create_transaction(
-            amount.id,
-            data.type,
-            data.category,
-            data.count
-        )
-    except Exception:
+    except InvalidTransactionDataError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Некорректные данные",
         )
-    
-    return {}
 

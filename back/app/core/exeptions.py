@@ -73,3 +73,19 @@ class UserNotFoundError(Exception):
 
 class InvalidCredentialsError(Exception):
     pass
+
+
+class AmountNotFoundError(Exception):
+    pass
+
+
+class AmountAlreadyExistsError(Exception):
+    pass
+
+
+class InvalidAmountDataError(Exception):
+    pass
+
+
+class InvalidTransactionDataError(Exception):
+    pass
