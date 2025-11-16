@@ -1,8 +1,12 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.db import AmountORM, TransactionORM
+from app.core.logger import get_logger
 from typing import List, Optional
 from datetime import datetime
+
+logger = get_logger(__name__)
+
 
 class AmountRepository:
     def __init__(self, session: AsyncSession):
@@ -19,11 +23,18 @@ class AmountRepository:
         return list(result.scalars().all())
 
     async def create_amount(self, name: str, count: float = 0.0) -> AmountORM:
-        amount = AmountORM(name=name, count=count)
-        self.session.add(amount)
-        await self.session.commit()
-        await self.session.refresh(amount)
-        return amount
+        logger.debug(f"Creating amount in database: name={name}, count={count}")
+        try:
+            amount = AmountORM(name=name, count=count)
+            self.session.add(amount)
+            await self.session.commit()
+            await self.session.refresh(amount)
+            logger.debug(f"Amount created in database: id={amount.id}, name={name}, count={count}")
+            return amount
+        except Exception as e:
+            logger.error(f"Failed to create amount in database: name={name}, error={e}", exc_info=True)
+            await self.session.rollback()
+            raise
 
     async def get_transactions(
         self,
@@ -62,23 +73,45 @@ class AmountRepository:
         category: str,
         count: float
     ) -> TransactionORM:
-        transaction = TransactionORM(
-            amount_id=amount_id,
-            type=transaction_type,
-            category=category,
-            count=count
+        logger.debug(
+            f"Creating transaction in database: amount_id={amount_id}, "
+            f"type={transaction_type}, category={category}, count={count}"
         )
-        self.session.add(transaction)
-        
-        # Обновляем баланс счёта
-        amount = await self.session.get(AmountORM, amount_id)
-        if amount:
-            if transaction_type == 'income':
-                amount.count += count
-            elif transaction_type == 'outcome':
-                amount.count -= count
-        
-        await self.session.commit()
-        await self.session.refresh(transaction)
-        return transaction
+        try:
+            transaction = TransactionORM(
+                amount_id=amount_id,
+                type=transaction_type,
+                category=category,
+                count=count
+            )
+            self.session.add(transaction)
+            
+            # Обновляем баланс счёта
+            amount = await self.session.get(AmountORM, amount_id)
+            if amount:
+                old_balance = amount.count
+                if transaction_type == 'income':
+                    amount.count += count
+                elif transaction_type == 'outcome':
+                    amount.count -= count
+                logger.debug(
+                    f"Amount balance updated: amount_id={amount_id}, "
+                    f"old_balance={old_balance}, new_balance={amount.count}"
+                )
+            else:
+                logger.warning(f"Amount not found for transaction: amount_id={amount_id}")
+            
+            await self.session.commit()
+            await self.session.refresh(transaction)
+            if amount:
+                await self.session.refresh(amount)
+            logger.debug(f"Transaction created in database: id={transaction.id}")
+            return transaction
+        except Exception as e:
+            logger.error(
+                f"Failed to create transaction in database: amount_id={amount_id}, error={e}",
+                exc_info=True
+            )
+            await self.session.rollback()
+            raise
 
