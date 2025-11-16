@@ -1,30 +1,25 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import "./RecommendationCard.css";
+import recAvatar from "../assets/recommendation/recommend-avatar.png";
 
 function RecommendationCard() {
-  const navigate = useNavigate();
-
   return (
-    <div className="recommendation-card">
-      <div className="recommendation-icon"></div>
-      <div className="recommendation-content">
-        <div className="recommendation-title">Твоя рекомендация</div>
-        <div className="recommendation-text">Обрати внимание на эквайринг</div>
-        <button
-          className="recommendation-button"
-          onClick={() => navigate("/analytics/recommendation")}
-        >
-          <span>Подробнее</span>
-          <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
-            <path
-              d="M1 12.3137L6.65685 6.65687L0.999999 1.00001"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+    <div className="recommend-card">
+      <div className="recommend-avatar-wrapper">
+        <div className="recommend-avatar-circle">
+          <img
+            src={recAvatar}
+            alt="Рекомендация"
+            className="recommend-avatar-image"
+          />
+        </div>
+      </div>
+      <div className="recommend-content">
+        <div className="recommend-title">Твоя рекомендация</div>
+        <div className="recommend-text">Обрати внимание на эквайринг</div>
+        <button className="recommend-button" type="button">
+          Подробнее
+          <span className="recommend-button-arrow">›</span>
         </button>
       </div>
     </div>

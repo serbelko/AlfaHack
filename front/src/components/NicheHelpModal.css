@@ -1,0 +1,69 @@
+.niche-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.niche-modal-card {
+  width: 100%;
+  max-width: 340px;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 20px 20px 18px 20px;
+  box-sizing: border-box;
+  animation: nicheModalIn 0.2s ease-out;
+}
+
+.niche-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.niche-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.niche-modal-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.niche-modal-body {
+  font-size: 14px;
+  line-height: 1.45;
+  color: #111111;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Анимация появления */
+@keyframes nicheModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

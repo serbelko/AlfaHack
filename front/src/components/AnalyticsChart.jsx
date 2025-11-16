@@ -1,97 +1,128 @@
 import React from "react";
 import "./AnalyticsChart.css";
 
-function AnalyticsChart({ incomeData = [], expensesData = [], labels = [] }) {
-  const maxValue = Math.max(...incomeData, ...expensesData);
-  const minValue = 0;
-  const range = maxValue - minValue;
-  
-  const gridLines = [
-    maxValue,
-    maxValue * 0.75,
-    maxValue * 0.5,
-    maxValue * 0.25,
-    0
-  ];
+function AnalyticsChart({ incomeData, expensesData, labels, yTicks }) {
+  const safeIncome = Array.isArray(incomeData) ? incomeData : [];
+  const safeExpenses = Array.isArray(expensesData) ? expensesData : [];
+  const safeLabels = Array.isArray(labels) ? labels : [];
 
-  const formatValue = (value) => {
-    return new Intl.NumberFormat('ru-RU', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value) + '₽';
+  const pointsCount = Math.max(
+    safeIncome.length,
+    safeExpenses.length,
+    safeLabels.length
+  );
+
+  if (pointsCount === 0) {
+    return (
+      <div className="chart-empty">Нет данных для отображения графика</div>
+    );
+  }
+
+  const ticksArray = Array.isArray(yTicks) && yTicks.length > 0 ? yTicks : [0];
+  const maxTick = ticksArray[ticksArray.length - 1];
+
+  const fullWidth = 340;
+  const graphWidth = 270;
+  const chartHeight = 170;
+  const topPadding = 14;
+  const bottomPadding = 16;
+  const innerHeight = chartHeight - topPadding - bottomPadding;
+
+  const xStep = pointsCount > 1 ? graphWidth / (pointsCount - 1) : 0;
+
+  const normalizeY = (value) => {
+    if (!maxTick || maxTick <= 0) {
+      return topPadding + innerHeight;
+    }
+    const ratio = Math.min(Math.max(value / maxTick, 0), 1);
+    return topPadding + innerHeight - ratio * innerHeight;
   };
 
-  const getYPosition = (value) => {
-    return ((maxValue - value) / range) * 186;
-  };
-
-  const createPath = (data) => {
-    if (!data || data.length === 0) return "";
-    
-    const xStep = 254 / (data.length - 1);
-    const points = data.map((value, index) => {
+  const incomePoints = safeIncome
+    .map((v, index) => {
       const x = index * xStep;
-      const y = getYPosition(value);
+      const y = normalizeY(v);
       return `${x},${y}`;
-    });
-    
-    return `M ${points.join(" L ")}`;
-  };
+    })
+    .join(" ");
 
-  const incomePath = createPath(incomeData);
-  const expensesPath = createPath(expensesData);
-
-  const displayLabels = labels.length > 0 ? labels : 
-    incomeData.slice(0, 5).map((_, i) => `${i + 1}`);
+  const expensesPoints = safeExpenses
+    .map((v, index) => {
+      const x = index * xStep;
+      const y = normalizeY(v);
+      return `${x},${y}`;
+    })
+    .join(" ");
 
   return (
-    <div className="analytics-chart">
-      <div className="chart-grid">
-        {gridLines.map((value, index) => (
-          <div
-            key={index}
-            className="grid-line"
-            style={{ top: `${getYPosition(value)}px` }}
-          >
-            <svg width="273" height="1" viewBox="0 0 274 1" fill="none">
-              <path
-                d="M0.5 0.5L273.5 0.500024"
-                stroke="#A3A3A3"
-                strokeLinecap="round"
-                strokeDasharray="4 4"
-              />
-            </svg>
-            <span className="grid-label">{formatValue(value)}</span>
-          </div>
-        ))}
+    <div className="chart-container">
+      <div className="chart-inner">
+        <svg
+          className="chart-svg"
+          width="100%"
+          height={chartHeight}
+          viewBox={`0 0 ${fullWidth} ${chartHeight}`}
+          preserveAspectRatio="none"
+        >
+          {ticksArray.map((tick) => {
+            const y = normalizeY(tick);
+            return (
+              <g key={tick}>
+                <line
+                  x1={0}
+                  y1={y}
+                  x2={graphWidth}
+                  y2={y}
+                  stroke="#E5E5EA"
+                  strokeDasharray="4 4"
+                  strokeWidth="1"
+                />
+                <text
+                  x={fullWidth}
+                  y={y - 2}
+                  textAnchor="end"
+                  fontSize="10"
+                  fill="#8E8E93"
+                >
+                  {tick.toLocaleString("ru-RU", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  Р
+                </text>
+              </g>
+            );
+          })}
+
+          {incomePoints && (
+            <polyline
+              points={incomePoints}
+              fill="none"
+              stroke="#00C30D"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          )}
+
+          {expensesPoints && (
+            <polyline
+              points={expensesPoints}
+              fill="none"
+              stroke="#EF3125"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          )}
+        </svg>
       </div>
 
-      <svg className="chart-svg" width="254" height="186" viewBox="0 0 254 186">
-        {incomePath && (
-          <path
-            d={incomePath}
-            stroke="#00C10D"
-            strokeWidth="1"
-            strokeLinecap="round"
-            fill="none"
-          />
-        )}
-        {expensesPath && (
-          <path
-            d={expensesPath}
-            stroke="#EF3125"
-            strokeWidth="1"
-            strokeLinecap="round"
-            fill="none"
-          />
-        )}
-      </svg>
-
-      <div className="chart-x-labels">
-        {displayLabels.map((label, index) => (
-          <span key={index} className="x-label">
+      <div className="chart-x-axis">
+        {safeLabels.map((label) => (
+          <div key={label} className="chart-x-label">
             {label}
-          </span>
+          </div>
         ))}
       </div>
     </div>

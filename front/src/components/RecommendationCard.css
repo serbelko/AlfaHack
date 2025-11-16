@@ -1,61 +1,69 @@
-.recommendation-card {
-  display: flex;
+.recommend-card {
+  margin-top: 16px;
+  width: 100%;
+  box-sizing: border-box;
   padding: 16px;
-  gap: 26px;
-  align-self: stretch;
   border-radius: 16px;
-  background: rgba(239, 49, 37, 1);
+  background: #ff3b30;
+  display: flex;
+  align-items: center;
 }
 
-.recommendation-icon {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FFB6B6 0%, #FF8787 100%);
-  flex-shrink: 0;
+.recommend-avatar-wrapper {
+  margin-right: 12px;
 }
 
-.recommendation-content {
+.recommend-avatar-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: #ff6b5e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.recommend-avatar-image {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+.recommend-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1 0 0;
+  gap: 4px;
 }
 
-.recommendation-title {
-  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
-  font-size: 16px;
-  font-weight: 530;
-  line-height: 22px;
-  color: #fff;
-}
-
-.recommendation-text {
-  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+.recommend-title {
   font-size: 14px;
-  font-weight: 530;
-  line-height: 22px;
-  color: #fff;
+  font-weight: 600;
+  color: #ffffff;
 }
 
-.recommendation-button {
-  display: flex;
-  padding: 4px 17px 5px;
-  justify-content: space-between;
-  align-items: center;
-  align-self: stretch;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.50);
+.recommend-text {
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.recommend-button {
+  margin-top: 8px;
+  align-self: flex-start;
+  padding: 6px 14px;
+  border-radius: 18px;
   border: none;
-  cursor: pointer;
-  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
-  font-size: 14px;
-  font-weight: 530;
-  line-height: 22px;
-  color: #fff;
-  transition: background 0.2s ease;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ff3b30;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.recommendation-button:hover {
-  background: rgba(255, 255, 255, 0.65);
+.recommend-button-arrow {
+  font-size: 16px;
+  line-height: 1;
 }

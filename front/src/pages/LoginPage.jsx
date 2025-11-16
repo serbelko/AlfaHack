@@ -1,29 +1,47 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./LoginPage.css";
-import { loginRequest } from "../api/authApi";
+import { loginRequest, isAuthenticated } from "../api/authApi";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      const from = location.state?.from?.pathname || "/";
+      navigate(from, { replace: true });
+    }
+  }, [location.state, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
+    setError("");
     setIsLoading(true);
 
     try {
-      await loginRequest(login, password);
-      navigate("/", { replace: true });
+      const trimmedLogin = login.trim();
+      const trimmedPassword = password.trim();
+      if (!trimmedLogin || !trimmedPassword) {
+        setError("Введите логин и пароль");
+        setIsLoading(false);
+        return;
+      }
+
+      await loginRequest(trimmedLogin, trimmedPassword);
+
+      const from = location.state?.from?.pathname || "/";
+      navigate(from, { replace: true });
     } catch (err) {
-      console.error(err);
       if (err.status === 401) {
         setError("Неверный логин или пароль");
       } else if (err.status === 404) {
-        setError("Сервис авторизации не найден (404)");
+        setError("Пользователь с таким логином не найден");
       } else {
         setError("Техническая ошибка. Попробуйте позже");
       }
@@ -33,7 +51,9 @@ function LoginPage() {
   };
 
   const handleForgotPassword = () => {
-    alert("Здесь будет восстановление логина/пароля");
+    alert(
+      "Обратитесь к администратору или в поддержку, чтобы восстановить доступ."
+    );
   };
 
   return (
@@ -55,6 +75,7 @@ function LoginPage() {
               type="text"
               value={login}
               onChange={(e) => setLogin(e.target.value)}
+              autoComplete="username"
               required
             />
           </div>
@@ -66,6 +87,7 @@ function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
               required
             />
           </div>

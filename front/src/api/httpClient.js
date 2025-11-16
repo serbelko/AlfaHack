@@ -14,35 +14,48 @@ export function setToken(token) {
 }
 
 export async function request(path, options = {}) {
-  const { method = "GET", body, auth = false } = options;
+  const method = options.method || "GET";
+  const auth = options.auth || false;
+  const originalHeaders = options.headers || {};
+  const body = options.body;
 
-  const headers = { "Content-Type": "application/json" };
+  const headers = { ...originalHeaders };
 
   if (auth) {
     const token = getToken();
     if (token) {
-      headers.Authorization = `Bearer ${token}`; // если бэк реально ждёт "Baerer", поменяешь здесь
+      headers.Authorization = `Bearer ${token}`;
     }
+  }
+
+  let payload = body;
+  if (body && !(body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+    payload = JSON.stringify(body);
   }
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method,
     headers,
-    body: body ? JSON.stringify(body) : undefined,
+    body: payload,
   });
 
   const text = await res.text();
   let data = null;
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    data = text;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = text;
+    }
   }
 
   if (!res.ok) {
-    const err = new Error(
-      (data && data.message) || `Request failed with status ${res.status}`
-    );
+    const message =
+      typeof data === "string" && data
+        ? data
+        : `Request failed with status ${res.status}`;
+    const err = new Error(message);
     err.status = res.status;
     err.data = data;
     throw err;
