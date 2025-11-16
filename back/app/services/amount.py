@@ -219,7 +219,8 @@ class AmountService:
             TransactionItem(
                 type=trans.type,
                 category=trans.category,
-                count=trans.count
+                count=trans.count,
+                created_at=trans.created_at
             )
             for trans in transactions
         ]

@@ -1,3 +1,4 @@
+from app.core.db import TransactionORM
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.db import AmountORM, TransactionORM
@@ -55,7 +56,7 @@ class AmountRepository:
         query = query.order_by(TransactionORM.created_at.desc())
         
         result = await self.session.execute(query)
-        return list(result.scalars().all())
+        return list[TransactionORM](result.scalars().all())
 
     async def get_latest_transaction(self, amount_id: int) -> Optional[TransactionORM]:
         result = await self.session.execute(

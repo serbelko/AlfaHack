@@ -504,6 +504,9 @@ docker compose run --rm app python -m app.scripts.seed_users
 ```bash
 docker compose exec app python -m app.scripts.seed_users
 ```
+```bash
+docker compose exec app python -m app.scripts.seed_amounts
+```
 
 Скрипт:
 

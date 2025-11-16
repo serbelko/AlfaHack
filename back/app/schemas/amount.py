@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+from datetime import datetime
 
 class AmountResponse(BaseModel):
     count: float
@@ -13,6 +14,7 @@ class TransactionItem(BaseModel):
     type: str
     category: str
     count: float
+    created_at: datetime
 
 class HistoryResponse(BaseModel):
     name: str
