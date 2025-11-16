@@ -7,7 +7,9 @@ from fastapi import (
     Header,
     status,
     Query,
+    Security,
 )
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.session import get_mock_session
@@ -32,29 +34,18 @@ from app.services.security import SecurityManager
 router = APIRouter(prefix="/api/amount", tags=["amount"])
 logger = get_logger(__name__)
 
+# Схема безопасности для Swagger UI
+security = HTTPBearer()
+
 
 async def verify_token(
-    authorization: Optional[str] = Header(None, alias="Authorization"),
+    credentials: HTTPAuthorizationCredentials = Security(security),
 ):
     """
     Проверяет JWT токен из заголовка Authorization.
+    Использует HTTPBearer для автоматической интеграции со Swagger UI.
     """
-    if not authorization:
-        logger.warning("Token verification failed: Authorization header not found")
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="JWT NOT FOUND",
-        )
-
-    parts = authorization.split()
-    if len(parts) != 2 or parts[0].lower() != "bearer":
-        logger.warning("Token verification failed: Invalid Authorization header format")
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="JWT NOT FOUND",
-        )
-
-    token = parts[1]
+    token = credentials.credentials
 
     try:
         SecurityManager.decode_access_token(token)

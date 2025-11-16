@@ -60,7 +60,11 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Backend", lifespan=lifespan, redirect_slashes=False)
+    app = FastAPI(
+        title="Backend",
+        lifespan=lifespan,
+        redirect_slashes=False,
+    )
 
     # Добавляем middleware для логирования (должен быть первым)
     app.add_middleware(LoggingMiddleware)
