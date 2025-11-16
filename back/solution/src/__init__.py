@@ -1,0 +1,2 @@
+"""Solution microservice package."""
+

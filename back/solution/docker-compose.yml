@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    restart: unless-stopped
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: solution-app
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_URL=http://127.0.0.1:11434/
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+
