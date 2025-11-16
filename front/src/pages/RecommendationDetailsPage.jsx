@@ -1,14 +1,22 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./RecommendationDetailsPage.css";
 import recAvatar from "../assets/recommendation/recommend-avatar.png";
 
 function RecommendationDetailsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // сюда ты передаёшь текст с бэка:
+  // navigate("/analytics/recommendation", { state: { backendMessage: "текст" } })
+  const backendMessage = location.state?.backendMessage;
 
   const handleBack = () => {
     navigate(-1);
   };
+
+  const hasBackendMessage =
+    typeof backendMessage === "string" && backendMessage.trim().length > 0;
 
   return (
     <div className="reco-page">
@@ -51,52 +59,72 @@ function RecommendationDetailsPage() {
             <div className="reco-card-header-text">
               <div className="reco-card-label">Твоя рекомендация</div>
               <div className="reco-card-main-title">
-                Обрати внимание на эквайринг
+                {hasBackendMessage
+                  ? "Персональная рекомендация для твоего бизнеса"
+                  : "Обрати внимание на эквайринг"}
               </div>
             </div>
           </div>
 
-          <p className="reco-intro">
-            Позже здесь будут отображаться персональные рекомендации с бэкенда.
-            Сейчас это заглушка, чтобы можно было протестировать навигацию и
-            экран рекомендаций.
-          </p>
+          {hasBackendMessage ? (
+            <>
+              {/* Вариант, когда есть ответ от бэка */}
+              <p className="reco-intro">
+                Ниже рекомендация, которую подготовил помощник на основе твоих
+                данных:
+              </p>
 
-          <div className="reco-block">
-            <div className="reco-block-title">Почему это важно</div>
-            <ul className="reco-list">
-              <li className="reco-list-item">
-                Клиентам удобнее оплачивать картой сразу после услуги, это
-                повышает конверсию в оплату.
-              </li>
-              <li className="reco-list-item">
-                Безналичные платежи позволяют точнее считать выручку по дням и
-                неделям в аналитике.
-              </li>
-              <li className="reco-list-item">
-                Прозрачный денежный поток помогает планировать аренду, закупки и
-                зарплаты без кассовых разрывов.
-              </li>
-            </ul>
-          </div>
+              <div className="reco-block">
+                <div className="reco-block-title">Ответ помощника</div>
+                <p className="reco-backend-text">{backendMessage}</p>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Фоллбек — твой исходный шаблон */}
+              <p className="reco-intro">
+                Позже здесь будут отображаться персональные рекомендации с
+                бэкенда. Сейчас это заглушка, чтобы можно было протестировать
+                навигацию и экран рекомендаций.
+              </p>
 
-          <div className="reco-block">
-            <div className="reco-block-title">Что можно сделать сейчас</div>
-            <ul className="reco-list">
-              <li className="reco-list-item">
-                Подключить эквайринг и добавить оплату картой во все основные
-                сценарии работы с клиентом.
-              </li>
-              <li className="reco-list-item">
-                Отслеживать долю оплат по карте в разделе аналитики и смотреть,
-                как она меняется по месяцам.
-              </li>
-              <li className="reco-list-item">
-                Использовать безнал как повод для акций и программ лояльности,
-                чтобы увеличить повторные визиты.
-              </li>
-            </ul>
-          </div>
+              <div className="reco-block">
+                <div className="reco-block-title">Почему это важно</div>
+                <ul className="reco-list">
+                  <li className="reco-list-item">
+                    Клиентам удобнее оплачивать картой сразу после услуги, это
+                    повышает конверсию в оплату.
+                  </li>
+                  <li className="reco-list-item">
+                    Безналичные платежи позволяют точнее считать выручку по дням
+                    и неделям в аналитике.
+                  </li>
+                  <li className="reco-list-item">
+                    Прозрачный денежный поток помогает планировать аренду,
+                    закупки и зарплаты без кассовых разрывов.
+                  </li>
+                </ul>
+              </div>
+
+              <div className="reco-block">
+                <div className="reco-block-title">Что можно сделать сейчас</div>
+                <ul className="reco-list">
+                  <li className="reco-list-item">
+                    Подключить эквайринг и добавить оплату картой во все
+                    основные сценарии работы с клиентом.
+                  </li>
+                  <li className="reco-list-item">
+                    Отслеживать долю оплат по карте в разделе аналитики и
+                    смотреть, как она меняется по месяцам.
+                  </li>
+                  <li className="reco-list-item">
+                    Использовать безнал как повод для акций и программ
+                    лояльности, чтобы увеличить повторные визиты.
+                  </li>
+                </ul>
+              </div>
+            </>
+          )}
 
           <button
             type="button"

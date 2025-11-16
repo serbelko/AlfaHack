@@ -12,6 +12,7 @@ import nailsImage from "../assets/competitors/nails.png";
 import spaImage from "../assets/competitors/spa.png";
 import massageImage from "../assets/competitors/massage.png";
 import headerAvatar from "../assets/header/avatar.png";
+import { getRecommendationSegment } from "../api/aiApi";
 
 const mockDataByPeriod = {
   month: {
@@ -88,6 +89,7 @@ function formatCurrency(value) {
 
 function AnalyticsPage({ initialTab = "analytics" }) {
   const navigate = useNavigate();
+  const [recommendationSegment, setRecommendationSegment] = useState(null);
 
   const [activeTab, setActiveTab] = useState(initialTab);
   const [period, setPeriod] = useState("month");
@@ -120,6 +122,36 @@ function AnalyticsPage({ initialTab = "analytics" }) {
       setCustomRange({ from: null, to: null });
     }
   };
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadRecommendation() {
+      try {
+        const segment = await getRecommendationSegment({
+          city,
+          niche: "Кофейня to-go", // можно завязать на реальные поля, если есть
+          priceSegment,
+          district,
+        });
+
+        if (!isCancelled) {
+          setRecommendationSegment(segment);
+        }
+      } catch (err) {
+        console.error("Failed to load AI recommendation", err);
+        if (!isCancelled) {
+          // Фоллбек: просто оставляем null - фронт покажет шаблон
+          setRecommendationSegment(null);
+        }
+      }
+    }
+
+    loadRecommendation();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [city, priceSegment, district]);
 
   const handleApplyRange = ({ from, to }) => {
     setCustomRange({ from, to });
@@ -300,7 +332,7 @@ function AnalyticsPage({ initialTab = "analytics" }) {
             />
           </div>
 
-          <RecommendationCard />
+          <RecommendationCard segment={recommendationSegment} />
         </div>
       )}
 
