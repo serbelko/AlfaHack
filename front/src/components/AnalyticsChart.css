@@ -1,0 +1,58 @@
+.analytics-chart {
+  position: relative;
+  width: 100%;
+  height: 287px;
+  margin-top: 10px;
+}
+
+.chart-grid {
+  position: absolute;
+  top: 57px;
+  left: 0;
+  width: 273px;
+  height: 186px;
+}
+
+.grid-line {
+  position: absolute;
+  left: 0;
+  width: 273px;
+  display: flex;
+  align-items: center;
+}
+
+.grid-label {
+  position: absolute;
+  right: -80px;
+  color: rgba(163, 163, 163, 1);
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 530;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+.chart-svg {
+  position: absolute;
+  top: 57px;
+  left: 12px;
+}
+
+.chart-x-labels {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 273px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0;
+}
+
+.x-label {
+  color: rgba(163, 163, 163, 1);
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 530;
+  line-height: 22px;
+  text-align: center;
+}

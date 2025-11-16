@@ -21,7 +21,6 @@ function LoginPage() {
     } catch (err) {
       console.error(err);
       if (err.status === 401) {
-        // ТЗ: wrong login or password
         setError("Неверный логин или пароль");
       } else if (err.status === 404) {
         setError("Сервис авторизации не найден (404)");

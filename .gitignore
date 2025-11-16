@@ -58,3 +58,5 @@ alembic/versions/__pycache__/
 # === Misc ===
 *.swp
 *.swo
+
+.config/
