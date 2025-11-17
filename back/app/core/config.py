@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     MOCK_POSTGRES_USER: str
     MOCK_POSTGRES_PASSWORD: str
     MOCK_POSTGRES_DB: str
+    SERVICE_API_TOKEN: str | None = None
 
     @property
     def ASYNC_DATABASE_URL_computed(self) -> str:

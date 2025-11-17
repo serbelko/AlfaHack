@@ -90,6 +90,8 @@ services:
       context: ./back/solution
       dockerfile: dockerfile
     container_name: solution-app
+    env_file:
+      - .env
     ports:
       - "8001:8001"
     environment:

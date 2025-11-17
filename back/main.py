@@ -124,11 +124,13 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=[
             "http://localhost:5173",  # Vite dev server
-            "http://localhost:80",    # Production frontend
+            "http://localhost:80",
+            "http://localhost:8001",    # Production frontend
             "http://localhost",       # localhost without port
             "http://127.0.0.1:5173",  # Vite dev server (IP)
             "http://127.0.0.1:80",    # Production frontend (IP)
-            "http://127.0.0.1",       # localhost IP without port
+            "http://127.0.0.1",
+            "http://127.0.0.1:8001",    # AI Service (IP)
             "http://frontend:80",     # Docker network
         ],
         allow_credentials=True,

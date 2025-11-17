@@ -30,21 +30,32 @@ from app.schemas.amount import (
     TransactionCreateRequest,
 )
 from app.services.security import SecurityManager
+from app.core.config import settings
 
 router = APIRouter(prefix="/api/amount", tags=["amount"])
 logger = get_logger(__name__)
 
 # Схема безопасности для Swagger UI
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 
 async def verify_token(
-    credentials: HTTPAuthorizationCredentials = Security(security),
+    credentials: HTTPAuthorizationCredentials | None = Security(security),
+    internal_token: str | None = Header(default=None, alias="X-Internal-Token"),
 ):
     """
-    Проверяет JWT токен из заголовка Authorization.
-    Использует HTTPBearer для автоматической интеграции со Swagger UI.
+    Проверяет JWT токен либо внутренний сервисный токен.
     """
+    if internal_token and settings.SERVICE_API_TOKEN and internal_token == settings.SERVICE_API_TOKEN:
+        logger.debug("Internal service token verified successfully")
+        return "internal"
+
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="JWT NOT FOUND",
+        )
+
     token = credentials.credentials
 
     try:

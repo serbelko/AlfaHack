@@ -136,9 +136,7 @@
    ```
 
 4. **Откройте в браузере:**
-   - Frontend: http://localhost
-   - Backend API: http://localhost:8000
-   - AI Service: http://localhost:8001
+   - Frontend: http://localhost:0080/
    - API документация: http://localhost:8000/docs
 
 ### Остановка сервисов
@@ -409,12 +407,15 @@ SECRET_KEY=your_secret_key_here
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 PASSWORD_MIN_LENGTH=8
 ALGORITHM=HS256
+API_BASE_URL=http://backend:8000
+SERVICE_API_TOKEN=super_secret_token
 
 # Auto-seed (автоматическое заполнение данных)
 AUTO_SEED=true
 
 # AI Service
 OLLAMA_URL=http://ollama:11434/
+SERVICE_API_TOKEN=super_secret_token
 ```
 
 ### Порты сервисов
