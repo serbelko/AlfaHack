@@ -14,6 +14,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/")
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 # Лимиты для работы с AI и текстом
 MAX_TEXT_LENGTH = int(os.getenv("MAX_TEXT_LENGTH", "3000"))  # Максимальная длина текста для анализа (уменьшено для скорости)
