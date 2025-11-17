@@ -19,7 +19,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - OLLAMA_URL=http://127.0.0.1:11434/
+      - OLLAMA_URL=http://ollama:11434/
     restart: unless-stopped
 
 volumes:

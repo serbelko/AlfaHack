@@ -15,7 +15,7 @@ async def get_ai_message_mock(payload: PromptRequest):
         async with httpx.AsyncClient() as client:
             async with client.stream(
                 "POST",
-                f"{OLLAMA_URL}api/chat",
+                f"{OLLAMA_URL.rstrip('/')}/api/chat",
                 json={
                     "model": "bambucha/saiga-llama3",
                     "messages": [{"role": "user", "content": "Поздоровайся максимально вежливо и попроси пользователя ввести запрос"}],
