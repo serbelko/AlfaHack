@@ -1,27 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./RecommendationCard.css";
 import recAvatar from "../assets/recommendation/recommend-avatar.png";
-import { fetchAIRecommendation } from "../api/aiApi";
 
-function RecommendationCard() {
+function RecommendationCard({ segment }) {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
-  const handleDetails = async () => {
-    setLoading(true);
-
-    // пример текста запроса, можешь подставить свои данные
-    const textForAI = "Кофейня в центре города, средний чек 350 рублей.";
-
-    const backendMessage = await fetchAIRecommendation(textForAI);
-
-    setLoading(false);
-
+  const handleDetails = () => {
     navigate("/analytics/recommendation", {
-      state: { backendMessage },
+      state: { segment: segment || null },
     });
   };
+
+  let subtitle = "Обрати внимание на эквайринг";
+  if (segment === "FIN") {
+    subtitle = "Сейчас критичнее навести порядок в финансах";
+  } else if (segment === "MRKT") {
+    subtitle = "Сейчас важнее сфокусироваться на клиентах и маркетинге";
+  }
 
   return (
     <div className="recommend-card">
@@ -37,10 +33,14 @@ function RecommendationCard() {
 
       <div className="recommend-content">
         <div className="recommend-title">Твоя рекомендация</div>
-        <div className="recommend-text">Обрати внимание на эквайринг</div>
+        <div className="recommend-text">{subtitle}</div>
 
-        <button className="recommend-button" onClick={handleDetails}>
-          {loading ? "Загрузка..." : "Подробнее"}
+        <button
+          className="recommend-button"
+          onClick={handleDetails}
+          type="button"
+        >
+          Подробнее
           <span className="recommend-button-arrow">›</span>
         </button>
       </div>
