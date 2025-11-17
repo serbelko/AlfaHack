@@ -7,16 +7,13 @@ function RecommendationDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // сюда ты передаёшь текст с бэка:
-  // navigate("/analytics/recommendation", { state: { backendMessage: "текст" } })
-  const backendMessage = location.state?.backendMessage;
+  const segment = location.state?.segment || null;
 
   const handleBack = () => {
     navigate(-1);
   };
 
-  const hasBackendMessage =
-    typeof backendMessage === "string" && backendMessage.trim().length > 0;
+  const hasSegment = segment === "FIN" || segment === "MRKT";
 
   return (
     <div className="reco-page">
@@ -59,29 +56,111 @@ function RecommendationDetailsPage() {
             <div className="reco-card-header-text">
               <div className="reco-card-label">Твоя рекомендация</div>
               <div className="reco-card-main-title">
-                {hasBackendMessage
-                  ? "Персональная рекомендация для твоего бизнеса"
+                {hasSegment
+                  ? segment === "FIN"
+                    ? "Сейчас важнее навести порядок в деньгах"
+                    : "Сейчас важнее поработать с клиентами и маркетингом"
                   : "Обрати внимание на эквайринг"}
               </div>
             </div>
           </div>
 
-          {hasBackendMessage ? (
-            <>
-              {/* Вариант, когда есть ответ от бэка */}
-              <p className="reco-intro">
-                Ниже рекомендация, которую подготовил помощник на основе твоих
-                данных:
-              </p>
+          {hasSegment ? (
+            segment === "FIN" ? (
+              <>
+                <p className="reco-intro">
+                  По данным помощника, у тебя сейчас более узкое место в
+                  финансовых потоках, а не в маркетинге.
+                </p>
 
-              <div className="reco-block">
-                <div className="reco-block-title">Ответ помощника</div>
-                <p className="reco-backend-text">{backendMessage}</p>
-              </div>
-            </>
+                <div className="reco-block">
+                  <div className="reco-block-title">Почему это важно</div>
+                  <ul className="reco-list">
+                    <li className="reco-list-item">
+                      Непрозрачный учёт мешает понимать реальную прибыль и
+                      контролировать кассовые разрывы.
+                    </li>
+                    <li className="reco-list-item">
+                      Без нормальной структуры расходов трудно принимать
+                      решения: нанимать людей, расширять меню, менять цены.
+                    </li>
+                    <li className="reco-list-item">
+                      Чёткий учёт помогает переживать просадки по выручке без
+                      паники и долгов.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="reco-block">
+                  <div className="reco-block-title">
+                    Что можно сделать сейчас
+                  </div>
+                  <ul className="reco-list">
+                    <li className="reco-list-item">
+                      Выделить отдельный счёт для бизнеса и проводить все
+                      операционные платежи только через него.
+                    </li>
+                    <li className="reco-list-item">
+                      Завести простую структуру категорий расходов и доходов и
+                      вносить операции каждый день.
+                    </li>
+                    <li className="reco-list-item">
+                      Настроить регулярный контроль: раз в неделю смотреть
+                      суммарную выручку, расходы и свободный остаток.
+                    </li>
+                  </ul>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="reco-intro">
+                  По данным помощника, сейчас больше потенциала в работе с
+                  клиентами и маркетингом, чем во внутренней оптимизации
+                  расходов.
+                </p>
+
+                <div className="reco-block">
+                  <div className="reco-block-title">Почему это важно</div>
+                  <ul className="reco-list">
+                    <li className="reco-list-item">
+                      При стабильных расходах рост выручки сильнее всего зависит
+                      от потока и возвратности клиентов.
+                    </li>
+                    <li className="reco-list-item">
+                      Те же ресурсы (аренда, персонал) могут приносить больше
+                      при лучшей загрузке.
+                    </li>
+                    <li className="reco-list-item">
+                      Сильный маркетинг позволяет переживать сезонные просадки
+                      за счёт повторных визитов и рекомендаций.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="reco-block">
+                  <div className="reco-block-title">
+                    Что можно сделать сейчас
+                  </div>
+                  <ul className="reco-list">
+                    <li className="reco-list-item">
+                      Сформулировать простое предложение: кому ты помогаешь и
+                      чем отличаешься от соседей.
+                    </li>
+                    <li className="reco-list-item">
+                      Настроить базовый сценарий возврата клиентов: напоминания,
+                      бонусы за повторный визит.
+                    </li>
+                    <li className="reco-list-item">
+                      Посмотреть, какие каналы реально приводят людей сейчас, и
+                      усилить именно их, а не распыляться.
+                    </li>
+                  </ul>
+                </div>
+              </>
+            )
           ) : (
             <>
-              {/* Фоллбек — твой исходный шаблон */}
+              {/* Фоллбек — твой исходный шаблон, если AI/бэк не ответили */}
               <p className="reco-intro">
                 Позже здесь будут отображаться персональные рекомендации с
                 бэкенда. Сейчас это заглушка, чтобы можно было протестировать

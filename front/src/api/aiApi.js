@@ -1,5 +1,12 @@
 import { request } from "./httpClient";
 
+/**
+ * Отправляет описание бизнеса и получает от бэка сегмент:
+ * "FIN" или "MRKT".
+ *
+ * Если бэк не ответил или вернул что-то странное → вернёт null,
+ * тогда фронт покажет шаблон.
+ */
 export async function getRecommendationSegment({
   city,
   niche,
@@ -17,13 +24,20 @@ export async function getRecommendationSegment({
     parts.join(". ") ||
     "Небольшой локальный бизнес. Подскажи, что критичнее сейчас: финансы или маркетинг.";
 
-  const res = await request("/api/ai/message", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ prompt }),
-  });
+  let res;
+  try {
+    res = await request("/api/ai/message", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    });
+  } catch (e) {
+    // Бэк не ответил → фронт работает в режиме заглушки
+    console.error("AI request failed", e);
+    return null;
+  }
 
   if (!res) {
     return null;
@@ -35,18 +49,4 @@ export async function getRecommendationSegment({
   if (value.includes("MRKT")) return "MRKT";
 
   return null;
-}
-
-export async function fetchAIRecommendation(text) {
-  try {
-    const res = await request("/api/ai/message", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: text }),
-    });
-
-    return res?.segment || null; // FIN / MRKT либо null
-  } catch {
-    return null;
-  }
 }
