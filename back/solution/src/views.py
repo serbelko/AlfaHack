@@ -4,6 +4,7 @@ import logging
 from typing import Any
 
 import httpx
+from fastapi import Request
 from fastapi.responses import Response, StreamingResponse
 
 from src.utils import parse_model_response
@@ -58,22 +59,27 @@ async def get_ai_message_mock(payload: PromptRequest):
     )
 
 
-async def fetch_api_data(endpoints: list[str]) -> list[dict[str, Any]]:
+async def fetch_api_data(endpoints: list[str], authorization_header: str | None = None) -> list[dict[str, Any]]:
     if not endpoints:
         return []
 
     headers = {}
-    if SERVICE_API_TOKEN:
-        headers["X-Internal-Token"] = SERVICE_API_TOKEN
 
-    async with httpx.AsyncClient(headers=headers) as api_client:
+    if authorization_header:
+        headers["Authorization"] = authorization_header
+
+    async with httpx.AsyncClient() as api_client:
         async def fetch_endpoint(endpoint: str):
             try:
-                response = await api_client.get(f"{API_BASE_URL}{endpoint}", timeout=30.0)
+                response = await api_client.get(
+                    f"{API_BASE_URL}{endpoint}",
+                    headers=headers,
+                    timeout=30.0
+                )
                 response.raise_for_status()
                 return {"endpoint": endpoint, "data": response.json(), "success": True}
             except Exception as exc:
-                return {"endpoint": endpoint, "error": str(exc), "success": False}
+d                return {"endpoint": endpoint, "error": str(exc), "success": False}
 
         results = await asyncio.gather(*(fetch_endpoint(endpoint) for endpoint in endpoints))
 
@@ -184,11 +190,14 @@ async def get_requests(payload: PromptRequest) -> dict[str, list[str]] | Respons
             return Response(status_code=500, content=f"Ошибка при запросе к модели: {str(exc)}")
 
 
-async def get_ai_message(payload: PromptRequest) -> Response | StreamingResponse:
+async def get_ai_message(payload: PromptRequest, request: Request) -> Response | StreamingResponse:
     """
     Обрабатывает пользовательский запрос: классифицирует его и запускает соответствующий сценарий.
     """
     logger.info("📥 Получен запрос на классификацию: '%s...'", payload.prompt[:100])
+    
+    # Принимаем заголовок Authorization как есть
+    authorization_header = request.headers.get("Authorization")
 
     classification_prompt = f"""
         ROLE: Ты — алгоритм классификации. Ты не даешь ответов на вопросы, а только классифицируешь их.
@@ -221,7 +230,7 @@ async def get_ai_message(payload: PromptRequest) -> Response | StreamingResponse
                 if isinstance(requests_data, Response):
                     return requests_data
                 endpoints = requests_data.get("endpoints", [])
-                api_data = await fetch_api_data(endpoints)
+                api_data = await fetch_api_data(endpoints, authorization_header=authorization_header)
                 return await receive_final_prompt(api_data, payload.prompt)
 
             if classification_result == "[MRKT]":
